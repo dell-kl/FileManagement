@@ -1,0 +1,171 @@
+﻿@using SIS_DIAF.Security;
+@inject EncriptacionPass security;
+
+@{
+    
+    ViewData["Title"] = "Asignaciones Verificacion";
+    Layout = "_Layout2";
+
+}
+
+@section styles {
+    <link rel="stylesheet" href="~/css/adminLogistc.css" />
+}
+
+
+<div class="logisticaAdministrador m-auto">
+    <div class="tablero p-2" style="border-radius: 5px;">
+        
+        <div class="alert alert-danger" role="alert">
+            Estos procesos <strong>ya no pueden ser cambiados</strong>, por el momento solo es una vista general de quien tiene la responsabilidad.
+        </div>
+
+        <hr />
+        
+        <!-- vamos agregar un buscar que busque por ciertos campos especificos. -->
+        <div class="d-flex justify-content-between mb-1">
+            <p class="fw-lighter">Realiza una busqueda de los regimenes que asignaste responsabilidades</p>
+
+            <form id="formularioBusqueda" method="post" asp-controller="LogisticaAdmin" asp-action="FiltrarlistaAsignaciones">
+                <div class="buscadorPorCampo d-flex align-items-center gap-1">
+
+                    <select name="tipo" class="form-select tipoBusqueda" aria-label="Default select example">
+                        <option selected disabled>-- 📃 Filtrar Por --</option>
+                        
+                        <option value="1">  🪪 Cedula</option>
+                        <option value="2"> 🎯 Objetivo</option>
+                        <option value="3"> 🧑‍💼 Responsable</option>
+                        
+                    </select>
+                    <div class="input-group">
+                        <input type="text" value="" name="entrada" class="form-control entradaBusqueda" style="width:60%" placeholder="🔎 Busca mas rapido escogiendo un tipo de busqueda" aria-describedby="basic-addon1">
+                    </div>
+                    <button type="submit" class="btn btn-primary loadingBtn">Buscar</button>
+                </div>
+            </form>
+
+        </div>
+
+
+        <div style="overflow-y:auto;height:24.2rem;" id="as4d68as4d8a">
+            <table class="table table-hover mb-3">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-center">
+                            ID
+                        </th>
+                        <th scope="col" class="text-center">
+                            Codigo
+                        </th>
+                        <th scope="col" class="text-center">
+                            🎯 Objetivo
+                        </th>
+                        <th scope="col" class="text-center">
+                            Guid
+                        </th>
+                        <th scope="col" class="text-center">
+                            🪪 Cédula
+                        </th>
+                        <th scope="col" class="text-center">
+                            🧑‍💼 Responsable
+                        </th>
+                        <th scope="col" class="text-center">
+                            Tipo
+                        </th>
+                        <th scope="col" class="text-center">
+                            Progreso %
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var lista = (List<ResponsableRegimen>)ViewBag.regimen;
+
+                        foreach(var n in lista)
+                        {
+                            var regimen = (Regimen) n.regimen;
+
+                            if ( regimen.Archivos.Count() > 0)
+                            {
+                                //verificar el tipo de archivos que son 
+                                string tipo = regimen.obtenerTipo();
+                                float progreso = regimen.getProgreso();
+                                int idTipRegs = (int)regimen.Archivos.First().TipoArchivo.TipoReg.tiporeg_id;
+
+                                <tr>
+                                    <td scope="row" class="text-center">@regimen.regimen_id</td>
+                                    <td class="text-center">@regimen.regimen_cod</td>
+                                    <td class="text-center">@regimen.regimen_objetivo</td>
+                                    <td class="text-center">@regimen.regimen_guid</td>
+                                    <td class="text-center">@n.usuario.usuario_cedula</td>
+                                    <td class="text-center">@n.usuario.usuario_nombre</td>
+                                    <td>
+                                        <div class="@(tipo.Equals("SERVICIOS") ? "bg-warning" : tipo.Equals("BIENES") ? "bg-success text-white" : "bg-primary text-white") text-center fw-bold p-2" style="border-radius:10px;">
+                                            @tipo
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="width:180px; height:20px" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: @progreso%">
+                                                @progreso%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a title="Visualizar Progreso Regimen" class="btn btn-outline-warning" asp-controller="Upload" asp-route-cod="@regimen.regimen_guid" asp-action="obtenerArchivosLogistica">👁‍🗨</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="acciones-paginador" style="margin:10px auto 0 auto;width:100%;">
+            <a class="btn btn-warning loadingPayload" asp-action="Asignaciones" asp-controller="LogisticaAdmin">🏠 Inicio</a>
+            
+            
+            @if ( security.DesencriptarUrl(TempData["entrada"]!.ToString()!).Equals("vacio") && security.DesencriptarUrl(TempData["tipo"]!.ToString()!).Equals("0"))
+            {
+                <a asp-controller="LogisticaAdmin" asp-action="Asignaciones" asp-route-direccion="@( security.EncriptrarUrl("atras") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )-1).ToString()) )" aria-disabled="@TempData["b-back"]" class="btn btn-primary @TempData["b-s-back"] loadingPayload">⬅️ Atras</a>
+                <a asp-controller="LogisticaAdmin" asp-action="Asignaciones" asp-route-direccion="@( security.EncriptrarUrl("siguiente") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )+1).ToString()) )" aria-disabled="@TempData["b-next"]!.ToString()" class="btn btn-primary @TempData["b-s-next"] loadingPayload">Siguiente ➡️</a>
+
+            }
+            else
+            {
+                <a asp-controller="LogisticaAdmin" asp-action="Asignaciones" asp-route-tipo="@TempData["tipo"]!.ToString()" asp-route-entrada="@TempData["entrada"]!.ToString()" asp-route-direccion="@( security.EncriptrarUrl("atras") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )-1).ToString()) )" aria-disabled="@TempData["b-back"]" class="btn btn-primary @TempData["b-s-back"] loadingPayload">⬅️ Atras</a>
+                <a asp-controller="LogisticaAdmin" asp-action="Asignaciones" asp-route-tipo="@TempData["tipo"]!.ToString()" asp-route-entrada="@TempData["entrada"]!.ToString()" asp-route-direccion="@( security.EncriptrarUrl("siguiente") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )+1).ToString()) )" aria-disabled="@TempData["b-next"]!.ToString()" class="btn btn-primary @TempData["b-s-next"] loadingPayload">Siguiente ➡️</a>
+
+            }
+
+        </div>
+
+    </div>
+</div>
+
+<script src="~/js/ValidarFormsRegimen.js"></script>
+
+<script>
+    function filterTable(inputId, colIndex) {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById(inputId);
+        filter = input.value;
+        table = document.querySelector('#as4d68as4d8a');
+        tbody = table.getElementsByTagName('tbody')[0];
+        tr = tbody.getElementsByTagName('tr');
+
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName('td')[colIndex];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+
+                if (txtValue.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>

@@ -1,0 +1,46 @@
+﻿.InicioSesion {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    .formulario
+    {
+    background-color: white;
+    border: 1px solid rgb(119 117 117 / 20%);
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 4px 22px 0px;
+    width:50%;
+    height: auto;
+
+    & form
+            {
+                
+                .campos{
+                             
+                            .campo{
+
+                                      width:100%;
+                                      padding:20px;
+                                      text-align:center;
+                                      .form-floating{
+                                            margin:auto;
+                                           & input{
+                                             
+                                               height:50px;
+                                               padding-left:10px;
+                                               border:none;
+                                               border-bottom:3px solid #111;
+                                         
+                                           }
+                                        }
+                                        .btn{
+                                            width:65%;
+                                        }
+                                  }
+                         }
+              }
+    }
+
+}
+

@@ -1,0 +1,20 @@
+﻿footer {
+    background-color: #305494;
+    padding: 1.2rem;
+    color: rgb(255, 255, 255);
+    display: flex;
+    justify-content: space-evenly;
+    height: 4rem;
+    p
+    {
+        color: rgb(255, 255, 255);
+        font-weight: lighter;
+    }
+
+    a {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: rgb(255, 255, 255);
+        text-decoration: none;
+    }
+}

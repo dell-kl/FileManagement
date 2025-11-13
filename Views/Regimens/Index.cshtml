@@ -1,0 +1,408 @@
+﻿@using SIS_DIAF.Security;
+@inject EncriptacionPass security;
+
+@{
+    Layout = "_Layout2";
+    ViewData["Title"] = "Regimenes";
+    var sucurl = (Sucursal)ViewBag.sucursal;
+    var responsables = (ICollection<Usuario>) ViewBag.usuariosResponsables;
+
+}
+
+@section styles {
+<link href="~/css/StyleRegimen.css" rel="stylesheet" />
+}
+
+<div class="m-auto container">
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-10">
+
+            @if (User.IsInRole("finanzas") || User.IsInRole("jurídico"))
+            {
+                <div class="codigoColores d-flex flex-wrap gap-2 justify-content-between">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <img src="~/images/iconos/cerrar.png" width="20" />
+                        <p class="text-danger m-0"><strong>Proceso bloqueado</strong>, Primero debe subirse <strong>@(User.IsInRole("finanzas") ? "ACTA ENTREGA RECEPCIÓN" : "SOLICITUD ADQUISICIÓN EXTERIOR")</strong></p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <img src="~/images/iconos/menos.png" width="20"/>
+                        <p style="color:tomato" class="m-0">Proceso pendiente por subir, debes subir <strong>@(User.IsInRole("finanzas") ? "LIQUIDACIÓN" : "CONTRATO FAE-DIAF")</strong></p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mb-4">
+                        <img src="~/images/comprobado.png" width="20"/>
+                        <p class="m-0 text-success">Proceso <strong>@(User.IsInRole("finanzas") ? "LIQUIDACIÓN" : "CONTRATO FAE-DIAF")</strong> subido correctamente</p>
+                    </div>
+                </div>
+            }
+
+            @if (User.IsInRole("administrador") || User.IsInRole("supervisor") || User.IsInRole("responsable") || User.IsInRole("usuario final"))
+            {
+                <h1>Listado Regimenes</h1>
+            }
+
+
+            <!-- Button trigger modal -->
+            <div class="d-flex justify-content-between mb-1">
+
+                @if ( User.IsInRole("administrador") || User.IsInRole("supervisor") )
+                {
+                    <button type="button" class="btn btn-success mb-1" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30" height="30" viewBox="0 0 48 48">
+                            <linearGradient id="2KeUjQEyFN4oTcHAsZy1ma_ziUTzUQyspi1_gr1" x1="24" x2="24" y1="79.391" y2="3.698" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffcce5"></stop><stop offset="1" stop-color="#4f587d"></stop></linearGradient>
+                            <path fill="url(#2KeUjQEyFN4oTcHAsZy1ma_ziUTzUQyspi1_gr1)" d="M42,11v21c0,1.657-1.343,3-3,3H24H6V11H2v28h22h16c3.314,0,6-2.686,6-6V11H42z"></path>
+                            <linearGradient id="2KeUjQEyFN4oTcHAsZy1mb_ziUTzUQyspi1_gr2" x1="43.35" x2="14.585" y1="-9.116" y2="40.705" gradientTransform="matrix(1 0 0 -1 0 30.31)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#faf3df"></stop><stop offset="1" stop-color="#8784b8"></stop></linearGradient>
+                            <path fill="url(#2KeUjQEyFN4oTcHAsZy1mb_ziUTzUQyspi1_gr2)" d="M42,32V8H28c-2.209,0-4,1.791-4,4v23h15C40.657,35,42,33.657,42,32z"></path>
+                            <linearGradient id="2KeUjQEyFN4oTcHAsZy1mc_ziUTzUQyspi1_gr3" x1="46.217" x2="16.673" y1="8.81" y2="8.81" gradientTransform="rotate(180 24 15.155)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#faf3df"></stop><stop offset="1" stop-color="#8784b8"></stop></linearGradient>
+                            <path fill="url(#2KeUjQEyFN4oTcHAsZy1mc_ziUTzUQyspi1_gr3)" d="M6,35V8h14c2.209,0,4,1.791,4,4v23H6z"></path>
+                            <linearGradient id="2KeUjQEyFN4oTcHAsZy1md_ziUTzUQyspi1_gr4" x1="13.5" x2="13.5" y1="-2.425" y2="23.434" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe2a6" stop-opacity="0"></stop><stop offset="1" stop-color="#730724" stop-opacity=".8"></stop></linearGradient>
+                            <polygon fill="url(#2KeUjQEyFN4oTcHAsZy1md_ziUTzUQyspi1_gr4)" points="17,21 13.5,19 10,21 10,8 17,8"></polygon>
+                        </svg>
+                        Crear Regimen
+                    </button>
+                }
+                else
+                {
+                    String valor = @User.IsInRole("responsable") ?
+                        "Continua con tus procesos que tienes pendientes" :
+                        @User.IsInRole("usuario final") ? "Como usuario final puedes revisar cada regimen creado y asignado" :
+                        @User.IsInRole("finanzas") || @User.IsInRole("jurídico") ? "Lista Regimenes, filtra por los regimenes donde tienes que subir tus archivos." :
+                        "Puedes inspeccionar los regimenes que asignaste a los responsables";
+                    <p class="fw-bold">@valor</p>
+                }
+
+            </div>
+
+            <div class="seccion-filtrado mb-3 mt-2">
+                <!-- Colocamos un filtrado para verificar por el tipo de presupuesto -->
+                <form id="formularioBusqueda" method="post" asp-controller="Regimens" asp-action="filtrarListadoRegimens">
+                    <div class="buscadorPorCampo d-flex align-items-center gap-1">
+
+                        <div class="input-group">
+                            <label class="input-group-text" for="inputGroupSelect01">Presupuesto</label>
+                            <select name="presupuesto" class="form-select" id="inputGroupSelect01">
+                                <option selected disabled>Selecciona un rango de presupuesto</option>
+                                <option value="1">$1 - $100.000</option>
+                                <option value="2">$100.001 - $500.000</option>
+                                <option value="3">$500.001 o más </option>
+                            </select>
+                        </div>
+
+                        <select name="tipo" class="form-select tipoBusqueda" aria-label="Default select example">
+                            <option selected disabled>-- 📃 Filtrar Por --</option>
+                            @if (!User.IsInRole("responsable"))
+                            {
+                                <option value="1">  🪪 Cedula</option>
+                                <option value="2"> 🎯 Objetivo</option>
+                                <option value="3"> 🧑‍💼 Responsable</option>
+                            }
+                            else
+                            {
+                                <option value="2"> 🎯 Objetivo</option>
+                            }
+                        </select>
+                        <div class="input-group">
+                            <input type="text" value="" name="entrada" class="form-control entradaBusqueda" style="width:60%" placeholder="🔎 Busca mas rapido escogiendo un tipo de busqueda" aria-describedby="basic-addon1">
+                        </div>
+                        <button type="submit" class="btn btn-primary loadingBtn">Buscar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal -->
+            @if (User.IsInRole("administrador") || User.IsInRole("supervisor"))
+            {
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">
+                                    <span class="mb-4" style="color:#999">Sucursal - </span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="ionicon-ubicacion" fill="currentColor" viewBox="0 0 512 512"><circle cx="256" cy="192" r="32" /><path d="M256 32c-88.22 0-160 68.65-160 153 0 40.17 18.31 93.59 54.42 158.78 29 52.34 62.55 99.67 80 123.22a31.75 31.75 0 0051.22 0c17.42-23.55 51-70.88 80-123.22C397.69 278.61 416 225.19 416 185c0-84.35-71.78-153-160-153zm0 224a64 64 0 1164-64 64.07 64.07 0 01-64 64z" /></svg>
+                                    @sucurl.sucursal_nombre
+                                </h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form asp-controller="Regimens" asp-action="Guardar">
+                                <div class="modal-body">
+                                    <input type="text" hidden name="tipo" value="1" />
+                                    <input type="text" hidden name="sucursal" value="@sucurl.sucursal_id" />
+                                    <p>Crea y asigna un proceso a tus responsables disponibles</p>
+                                    <select class="form-select mb-3" name="usuario" aria-label="Default select example">
+                                        <option value="0" selected>Seleccione un responsable</option>
+                                        @foreach (var u in responsables)
+                                        {
+                                            <option value="@u.usuario_id">CI: @u.usuario_cedula  -  @u.usuario_nombre</option>
+                                        }
+                                    </select>
+                                    <div class="form-floating mb-3">
+                                        <input type="number" name="presupuesto" id="presupuestoFloating" placeholder="Ingresa un presupuesto del regimen" class="form-control" />
+                                        <label for="presupuestoFloating">Presupuesto del Regimen</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <textarea class="form-control" name="objetivo" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 200px"></textarea>
+                                        <label for="floatingTextarea2">Objetivo del Regimen</label>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary loadingBtn">Generar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="tablaRegimens" style="overflow-x:auto;">
+
+                <table class="table table-hover mb-3" id="as4d68as4d8a">
+                    <thead>
+                        <tr>
+                            <th scope="col">
+                                ID
+                            </th>
+                            <th scope="col">
+                                Codigo
+                            </th>
+                            <th scope="col">
+                                💵 Presupuesto
+                            </th>
+                            <th scope="col">
+                                🎯  Objetivo
+                            </th>
+                            @if (!User.IsInRole("responsable"))
+                            {
+                                <th scope="col">
+                                    🪪  Cedula
+                                </th>
+
+                                <th scope="col">
+                                    🧑‍💼  Responsable
+                                </th>
+                            }
+
+                            @if (User.IsInRole("finanzas") || User.IsInRole("jurídico"))
+                            {
+                                <th scope="col">
+                                    Estado
+                                </th>
+                            }
+
+                            <th scope="col">
+                                Fecha de Creacion
+                            </th>
+                            <th scope="col">
+                                Progreso %
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var lista = (List<Regimen>)ViewBag.regimens;
+
+                            if (lista.Count > 0)
+                            {
+                                foreach (var r in lista)
+                                {
+                                    string presupuesto = String.Format("{0, 0:C2}", @r.regimen_presupuesto);
+
+                                    float progreso = @r.getProgreso();
+                                        <tr>
+                                            <td scope="row" style="vertical-align: middle">@r.regimen_id</td>
+                                            <td style="vertical-align: middle">@r.regimen_cod</td>
+                                            <td style="vertical-align: middle">@presupuesto</td>
+                                            <td style="vertical-align: middle">@r.regimen_objetivo</td>
+                                        @if (User.IsInRole("administrador") || User.IsInRole("supervisor") || User.IsInRole("usuario final") || User.IsInRole("finanzas") || User.IsInRole("jurídico"))
+                                        {
+                                            ResponsableRegimen n = r.responsableRegimen.Where(n => n.usuario.Rol.rol_descripcion.Equals("responsable")).FirstOrDefault();
+                                                <!-- datos del responsable. -->
+                                            if (n == null)
+                                            {
+                                                    <td style="vertical-align: middle" colspan="2">
+                                                        <div class="bg-danger p-1 text-white fw-bold" style="border-radius: 5px">
+                                                            Sin Responsable
+                                                        </div>
+                                                    </td>
+                                            }
+                                            else
+                                            {
+                                                    <td style="vertical-align: middle">@n.usuario.usuario_cedula</td>
+                                                    <td style="vertical-align: middle">@n.usuario.usuario_nombre</td>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            @if (!User.IsInRole("responsable"))
+                                            {
+                                                    <td style="vertical-align: middle">@User.FindFirst("Cedula")?.Value</td>
+                                                    <td style="vertical-align: middle">@User.FindFirst("Nombres")?.Value</td>
+                                            }
+                                        }
+                                        @if (User.IsInRole("finanzas") || User.IsInRole("jurídico"))
+                                        {
+                                            var archivoResponsableSubir = r.Archivos.Where(n => n.TipoArchivo.tipo_nombre.Equals("LIQUIDACIÓN")).FirstOrDefault();
+
+                                            if (User.IsInRole("jurídico"))
+                                                archivoResponsableSubir = r.Archivos.Where(n => n.TipoArchivo.tipo_nombre.Equals("CONTRATO FAE-DIAF")).FirstOrDefault();
+
+                                                <td scope="col" style="vertical-align: middle">
+                                                    <div>
+                                                        @if (archivoResponsableSubir.archivo_estado.Equals("vacio"))
+                                                    {
+                                                            <img src="~/images/iconos/cerrar.png" width="25" />
+                                                    }
+                                                    else if (archivoResponsableSubir.archivo_estado.Equals("pendiente"))
+                                                    {
+                                                            <img src="~/images/iconos/menos.png" width="25" />
+                                                    }
+                                                    else
+                                                    {
+                                                            <img src="~/images/comprobado.png" width="25" />
+                                                    }
+                                                    </div>
+                                                </td>
+                                        }
+                                            <td style="vertical-align: middle">@r.regimen_fecha_creacion</td>
+                                            <td style="vertical-align: middle">
+                                                <div class="progress" style="width:180px; height:20px" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: @progreso%">
+                                                        @progreso%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style="vertical-align: middle">
+                                                <center class="d-flex gap-1">
+                                                    @if (User.IsInRole("administrador") || User.IsInRole("responsable"))
+                                                {
+                                                        <a title="Trabajar Regimen" class="btn btn-outline-warning" asp-controller="Upload" asp-route-cod="@r.regimen_guid" asp-action="Index">📤</a>
+
+                                                }
+                                                else if (User.IsInRole("finanzas") || User.IsInRole("jurídico"))
+                                                {
+                                                        <a title="Trabajar Regimen" class="btn btn-outline-warning" asp-controller="Upload" asp-route-cod="@r.regimen_guid" asp-action="ObtenerArchivosResponsable">📤</a>
+                                                }
+                                                else
+                                                {
+                                                        <a title="Visualizar Progreso Regimen" class="btn btn-outline-warning" asp-controller="Upload" asp-route-cod="@r.regimen_guid" asp-action="Index">👁‍🗨</a>
+                                                }
+                                                    <a target="_blank" title="Reporte Final" style="cursor:pointer;" asp-controller="Regimens" asp-route-cod="@r.regimen_guid" asp-action="GenerarPdfReporte">
+                                                        <img width="30" src="~/images/iconos/expediente.png" />
+                                                    </a>
+                                                </center>
+                                            </td>
+                                        </tr>
+                                }
+                            }
+                            else
+                            {
+                                    <tr>
+                                        <th scope="row" colspan="7">
+                                            <center>
+                                                No hay regimens todavia
+                                            </center>
+                                        </th>
+                                    </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+            
+             </div>
+           <div class="col"></div>
+           
+       </div>
+       <div class="paginador m-auto pb-2" style="width:82%">
+        <a class="btn btn-warning loadingPayload" asp-controller="Regimens" asp-action="Index">🏠 Inicio</a>
+
+            @if (
+                security.DesencriptarUrl(TempData["entrada"]!.ToString()!).Equals("vacio") 
+                && 
+                security.DesencriptarUrl(TempData["tipo"]!.ToString()!).Equals("0")
+                &&
+                security.DesencriptarUrl(TempData["presupuesto"]!.ToString()!).Equals("0")
+            )
+            {
+                <a 
+                    asp-controller="Regimens" 
+                    asp-action="Index" 
+                    asp-route-direccion="@( security.EncriptrarUrl("atras") )" 
+                    asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )-1).ToString()) )" aria-disabled="@TempData["b-back"]" class="btn btn-primary @TempData["b-s-back"] loadingPayload">⬅️ Atras</a>
+                <a 
+                    asp-controller="Regimens" 
+                    asp-action="Index" 
+                    asp-route-direccion="@( security.EncriptrarUrl("siguiente") )" 
+                    asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )+1).ToString()) )" aria-disabled="@TempData["b-next"]!.ToString()" class="btn btn-primary @TempData["b-s-next"] loadingPayload">Siguiente ➡️</a>
+            }
+            else 
+            {
+                <a 
+                    asp-controller="Regimens" 
+                    asp-action="Index" 
+                    asp-route-tipo="@TempData["tipo"]!.ToString()" 
+                    asp-route-entrada="@TempData["entrada"]!.ToString()"
+                    asp-route-presupuesto="@TempData["presupuesto"]!.ToString()"
+                    asp-route-direccion="@( security.EncriptrarUrl("atras") )" 
+                    asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )-1).ToString()) )" aria-disabled="@TempData["b-back"]" class="btn btn-primary @TempData["b-s-back"] loadingPayload">⬅️ Atras</a>
+                <a 
+                    asp-controller="Regimens" 
+                    asp-action="Index"
+                    asp-route-tipo="@TempData["tipo"]!.ToString()"
+                    asp-route-entrada="@TempData["entrada"]!.ToString()"
+                    asp-route-presupuesto="@TempData["presupuesto"]!.ToString()"
+                    asp-route-direccion="@( security.EncriptrarUrl("siguiente") )" 
+                    asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )+1).ToString()) )" aria-disabled="@TempData["b-next"]!.ToString()" class="btn btn-primary @TempData["b-s-next"] loadingPayload">Siguiente ➡️</a>
+            }
+
+       </div>
+</div>
+
+<!--<script src="~/js/ValidarFormsRegimen.js"></script> -->
+
+<script>
+    function filterTable(inputId, colIndex) {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById(inputId);
+        filter = input.value;
+        table = document.querySelector('#as4d68as4d8a');
+        tbody = table.getElementsByTagName('tbody')[0];
+        tr = tbody.getElementsByTagName('tr');
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName('td')[colIndex];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+
+                if (txtValue.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";   
+                }
+            }
+        }
+    }
+</script>
+
+@section Scripts {
+
+    @{
+        //validaciones para poder mostrar los mensajes de error que se van a generar.
+        if (this.TempData.ContainsKey("error") && this.TempData["error"] != null)
+        {
+            var error = this.TempData["error"];
+
+            <script style="z-index:2">
+
+                swal({
+                    title: "Error",
+                    text: "@error",
+                    icon: "error",
+                    button: "Cerrar"
+                });
+            </script>
+        }
+
+    }
+}

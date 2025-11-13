@@ -1,0 +1,133 @@
+﻿@using SIS_DIAF.Security;
+@inject EncriptacionPass security;
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "_Layout2";
+
+    string estado = "";
+}
+
+@section styles {
+    <link href="~/css/logisticaEstilos.css" rel="stylesheet" />
+}
+
+<div class="logistica m-auto">
+
+    <div class="tabla procesoProgreso p-4">
+        <h4>Panel Logistica General</h4>
+
+        <div class="d-flex justify-content-between mb-1">
+
+            <p class="fw-lighter">Gestiona a continuacion estos siguientes procesos asignados</p>
+
+            <form id="formularioBusqueda" method="post" asp-controller="Logistica" asp-action="FiltrarListaRegimenes">
+                <div class="buscadorPorCampo d-flex align-items-center gap-1">
+
+                    <select name="tipo" class="form-select tipoBusqueda" aria-label="Default select example">
+                        <option selected disabled>-- 📃 Filtrar Por --</option>
+
+                        <option value="1"> 🎯 Descripcion</option>
+                        <option value="2"> 📁 Tipo Proceso</option>
+
+                    </select>
+                    <div class="input-group">
+                        <input type="text" value="" name="entrada" class="form-control entradaBusqueda" style="width:60%" placeholder="🔎 Busca mas rapido escogiendo un tipo de busqueda" aria-describedby="basic-addon1">
+                    </div>
+                    <button type="submit" class="btn btn-primary loadingBtn">Buscar</button>
+                </div>
+            </form>
+
+        </div>
+
+        <div style="overflow-y:auto;height:28rem;">
+            <table class="table table-responsive table-striped border-2" id="as4d68as4d8a">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-center">Id</th>
+                        <th scope="col" class="text-center">Codigo Regimen</th>
+                        <th scope="col" class="text-center">Guid Regimen</th>
+                        <th scope="col" class="text-center">🎯 Descripcion</th>
+                        <th scope="col" class="text-center">📁 Tipo</th>
+                        <th scope="col" class="text-center">Progreso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var datos = (List<Regimen>)ViewBag.regimens;
+
+                        if ( datos.Count > 0 )
+                        {
+
+                            foreach(var dato in datos)
+                            {
+                                var tipo = dato.obtenerTipo();
+
+                                int idTipRegs = (int) dato.Archivos.First().TipoArchivo.TipoReg.tiporeg_id;
+                                float progreso = dato.getProgreso(idTipRegs);
+
+                                <tr>
+                                    <td style="vertical-align:middle;">@dato.regimen_id</td>
+                                    <td style="vertical-align:middle;" scope="col">@dato.regimen_cod</td>
+                                    <td style="vertical-align:middle;">@dato.regimen_guid</td>
+                                    <td style="vertical-align:middle;">
+                                        @dato.regimen_objetivo
+                                    </td>
+                                    <td style="vertical-align:middle;">
+                                        @if (tipo.Equals("SERVICIOS"))
+                                        {
+                                            <p class="text-white" style="background-color:#0d6efd; color:black; font-weight:bold; text-align:center; padding:10px;border-radius:20px">@tipo</p>
+                                        }
+
+                                        @if (tipo.Equals("BIENES"))
+                                        {
+                                            <p class="text-white" style="background-color:#198754; color:black; font-weight:bold; text-align:center; padding:10px;border-radius:20px">@tipo</p>
+                                        }
+
+                                        @if (tipo.Equals("MANTENIMIENTO"))
+                                        {
+                                            <p style="background-color:#ffca2c; color:black; font-weight:bold; text-align:center; padding:10px;border-radius:20px">@tipo</p>
+                                        }
+                                    </td>
+                                    <td style="vertical-align:middle;">
+                                        <div class="progress" style="width:180px; height:20px" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar progress-bar-striped text-bg-success progress-bar-animated" style="width: @progreso%">@progreso%</div>
+                                        </div>
+                                    </td>
+                                    <td style="vertical-align:middle;">
+                                        <!--<a class="btn btn-warning" href="#">👁️</a> -->
+                                        <a class="btn btn-warning" asp-controller="Upload" asp-route-cod="@dato.regimen_guid" asp-action="ObtenerArchivosResponsable">📤</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="acciones-paginador" style="margin:10px auto 0 auto;width:100%;">
+            <a class="btn btn-warning loadingPayload" asp-action="Index" asp-controller="Logistica">🏠 Inicio</a>
+
+            @if (security.DesencriptarUrl(TempData["tipo"]!.ToString()!).Equals("0") && security.DesencriptarUrl(TempData["entrada"]!.ToString()!).Equals("vacio"))
+            {
+                <a asp-controller="Logistica" asp-action="Index" asp-route-direccion="@( security.EncriptrarUrl("atras") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )-1).ToString()) )" aria-disabled="@TempData["b-back"]" class="btn btn-primary @TempData["b-s-back"] loadingPayload">⬅️ Atras</a>
+                <a asp-controller="Logistica" asp-action="Index" asp-route-direccion="@( security.EncriptrarUrl("siguiente") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )+1).ToString()) )" aria-disabled="@TempData["b-next"]!.ToString()" class="btn btn-primary @TempData["b-s-next"] loadingPayload">Siguiente ➡️</a>
+            }
+            else
+            {
+                <a asp-controller="Logistica" asp-action="Index" asp-route-tipo="@TempData["tipo"]" asp-route-entrada="@TempData["entrada"]" asp-route-direccion="@( security.EncriptrarUrl("atras") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )-1).ToString()) )" aria-disabled="@TempData["b-back"]" class="btn btn-primary @TempData["b-s-back"] loadingPayload">⬅️ Atras</a>
+                <a asp-controller="Logistica" asp-action="Index" asp-route-tipo="@TempData["tipo"]" asp-route-entrada="@TempData["entrada"]" asp-route-direccion="@( security.EncriptrarUrl("siguiente") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )+1).ToString()) )" aria-disabled="@TempData["b-next"]!.ToString()" class="btn btn-primary @TempData["b-s-next"] loadingPayload">Siguiente ➡️</a>
+            }
+        
+        </div>
+
+    </div>
+</div>
+
+@section Scripts 
+{
+    <script src="~/js/ValidarFormsRegimen.js"></script>
+    
+}

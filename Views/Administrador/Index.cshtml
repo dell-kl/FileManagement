@@ -1,0 +1,94 @@
+﻿@{
+    Layout = "_Layout2";
+    ViewData["Title"] = "Administrador";
+}
+
+@section styles {
+    <link href="~/css/admin.css" rel="stylesheet" />
+}
+
+<main class="bg-white m-auto descripcion-empresa">
+    <div class="descripcion-empresa-contenido">
+        <div class="mt-4 seccion-1 m-auto d-flex flex-row align-items-center justify-content-center" style="max-width: 1224px;">
+            <div class="info-1" style="background-color: #ffc03d">
+                <h3 style="padding: 1rem 4rem; width: 10%;">Nuestra Empresa</h3>
+                <h2 style="padding: 0rem 4rem;" class="text-uppercase fw-bold">diaf</h2>
+
+                <p>Organismo de más alto nivel en el 
+                    Ecuador dedicado al desarrollo aeronáutico, mantenimiento, electrónica, 
+                    aviónica, ingeniería e investigación aplicada a la producción de bienes 
+                    y servicios aeronáuticos, construcción de elementos necesarios para la 
+                    industria y provisión de partes y repuestos integrando la más alta calidad 
+                    con tecnología de punta en todos servicio que brinda
+                </p>
+            </div>
+            <div class="info-2 position-relative">
+                <img 
+                    width="810"
+                    height="324"
+                    src="~/images/imagenInformacion_home.jpg"/>
+                
+                <div style="top:65%;right:0%;width:88%;left:10%;" class="seccion-info info-3 position-absolute d-flex flex-row align-items-center bg-white p-1">
+                    <section class="p-1" style="text-align: left; width: 160%;">
+                        <p class="p-0">Nuestras</p>
+                        <h3>Sedes y localización física</h3>
+                    </section>
+                    <section style="font-size: 13px;">
+                        La DIAF dispone de instalaciones administrativas en
+                        la ciudad de Quito,
+                        y centros operativos ubicados en
+                        el Aeropuerto Internacional Cotopaxi en la ciudad
+                        de Latacunga y el Aeropuerto Internacional José Joaquín
+                        de Olmedo en la ciudad de Guayaquil.
+                    </section>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="mt-3 mb-2 seccion-2 d-flex flex-row flex-wrap align-items-center justify-content-around">
+            <div class="localizacion sucursal-quito">
+                <h2>Quito</h2>
+                <p class="p-0">Voz Andes N41-63 y Mariano Echeverría</p>
+
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d744.8495069581512!2d-78.48784694088171!3d-0.16651686001534943!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d59a97a28aa5b9%3A0xae04a3ba9feb9aa8!2sVozandes%204163%2C%20Quito%20170104%2C%20Ecuador!5e0!3m2!1ses!2sus!4v1736523512322!5m2!1ses!2sus" 
+                    width="430" 
+                    height="300" 
+                    style="border:2px solid black; border-radius: 2px;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade"
+                ></iframe>
+            </div>
+            <div class="localizacion sucursal-quito">
+                <h2>Latacunga</h2>
+                <p class="p-0">Aeropuerto Internacional Cotopaxi</p>
+
+                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3989.304916840781!2d-78.61914953372955!3d-0.9191685173359069!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d4605e27108073%3A0x3129410cb387291b!2sAeropuerto%20Internacional%20Cotopaxi!5e0!3m2!1ses!2sus!4v1736523992070!5m2!1ses!2sus"
+                        width="430"
+                        height="300"
+                        style="border:2px solid black; border-radius: 2px;"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <div class="localizacion sucursal-quito">
+                <h2>Guayaquil</h2>
+                <p class="p-0">R4P5+QHR, 090513 Guayaquil, Ecuador</p>
+
+                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3205.3474264465435!2d-79.89228670235894!3d-2.162116351080975!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x902d6da8a8612c33%3A0x5727c1bb0f6edbd4!2sR4P5%2BQHR%2C%20090513%20Guayaquil%2C%20Ecuador!5e0!3m2!1ses!2sus!4v1736524056871!5m2!1ses!2sus"
+                        width="430"
+                        height="300"
+                        style="border:2px solid black; border-radius: 2px;"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+
+}

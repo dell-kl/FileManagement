@@ -1,0 +1,259 @@
+﻿@model SIS_DIAF.Models.ModelViews.UsuariosModelViews;
+
+@{
+    Layout = "_Layout2";
+    ViewData["Title"] = "Crear Usuario";
+}
+
+@section styles {
+    <link href="~/css/admin.css" rel="stylesheet" />
+}
+
+<div class="crearUsuario">
+    <h1>Crear Usuario</h1>
+
+        <div class="form-floating mb-3">
+
+            <button href="#" class="btn btn-success" id="btn-agregarUsuario" data-bs-toggle="modal" data-bs-target="#agregarUsuario">
+                <i class='bx bxs-user-plus'></i>
+                Agregar
+            </button>
+
+        </div>
+    <div class="tabla">
+        <table class="table table-striped table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-center fw-bold text-primary">Id</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Nombres</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Correo</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Celular</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Cedula</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Estado</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Rol</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var r in Model.Usuarios)
+                {
+                    <tr>
+                        <td scope="row">@r.usuario_id</td>
+                        <td style="vertical-align:middle; text-align: center"><p>@r.usuario_nombre</p></td>
+                        <td style="vertical-align:middle; text-align: center"><p>@r.usuario_email</p></td>
+                        <td style="vertical-align:middle; text-align: center">@r.usuario_celular</td>
+                        <td style="vertical-align:middle; text-align: center">@r.usuario_cedula</td>
+                        <td style="vertical-align:middle; text-align: center">
+                            @if (r.usuario_estado.Equals("activo"))
+                            {
+                                <div class="estado activo">@r.usuario_estado</div>
+                            }
+                            else
+                            {
+                                <div class="estado desactivado">@r.usuario_estado</div>
+                            }
+                        </td>
+                        <td style="vertical-align:middle; text-align: center">Administrador</td>
+                        <td class="editar-usuario" style="vertical-align:middle;">
+                            <a href="#" class="btn btn-warning" data-bs-toggle="modal" id="btn-editar-@r.usuario_id" data-bs-target="#editar-@r.usuario_id">
+                                <i class='bx bxs-edit-alt' style="font-size:20px;"></i>
+                            </a>
+                            <!-- Formulario para poder agregar a otro usuario -->
+                            <div class="modal fade formEditar" id="editar-@r.usuario_id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header d-flex flex-column">
+                                            <h3 class="modal-title fs-5 text-success" id="exampleModalLabel">Registrar Rol</h3>
+                                            <p class="">Puedes editar los datos actuales del usuario en cada campo.</p>
+                                        </div>
+                                        <form method="POST" asp-controller="Administrador" asp-action="EditUsuario">
+                                            <input type="hidden" value="@r.usuario_id" name="id" />
+                                            <div class="modal-body">
+                                                <div class="campos">
+                                                    <div class="campo">
+                                                        <label for="Nombre">Nombres</label>
+                                                        <input type="text" id="Nombre" name="nombre" value="@r.usuario_nombre" placeholder="Ingresa nombre y apellido del usuario." />
+                                                        <span></span>
+                                                    </div>
+                                                    <div class="campo">
+                                                        <label for="Cedula">Cedula</label>
+                                                        <input type="number" id="Cedula" name="cedula" value="@r.usuario_cedula" placeholder="Ingresa la cédula del usuario." />
+                                                        <span></span>
+                                                    </div>
+                                                    <div class="campo">
+                                                        <label for="Email">Email</label>
+                                                        <input type="text" id="Email" name="email" value="@r.usuario_email" placeholder="Ingresa un correo electrónico de contacto del usuario." />
+                                                        <span></span>
+                                                    </div>
+                                                    <div class="campo">
+                                                        <label for="Celular">Celular</label>
+                                                        <input type="tel" pattern="[0-9]{10,10}" value="@r.usuario_celular" id="Celular" name="celular" placeholder="Inserta un número de celular o telefono de contacto" />
+                                                        <span></span>
+                                                    </div>
+                                                    <div class="campo">
+                                                        <label for="Password">Contraseña</label>
+                                                        <input type="password" id="Password" name="clave" value="@r.usuario_passwd" placeholder="Asignale una contraseña segura al usuario" />
+                                                        <span></span>
+                                                    </div>
+                                                    <div class="campo">
+                                                        <label for="rol">Asignar Rol</label>
+                                                        <select id="rol" name="rol">
+                                                             <option value="" selected>Seleccione un rol</option>
+                                                            @foreach (var rol in Model.listaRoles)
+                                                            {
+                                                                <option value="@rol.rol_id" >@rol.rol_descripcion</option>
+                                                                
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                    <div class="campo">
+                                                        <label for="estado">Estado</label>
+                                                        <select id="estado" name="estado">
+                                                            @if (r.usuario_estado.Equals("activo"))
+                                                            {
+                                                                <option value="activo" selected>activo</option>
+                                                                <option value="inactivo">inactivo</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="activo">activo</option>
+                                                                <option value="inactivo" selected>inactivo</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-success">Registrar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="~/Administrador/DeleteUsuario/@r.usuario_id" class="btn btn-danger">
+                                <i class='bx bxs-trash' style="font-size:20px;"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Formulario para poder agregar a otro usuario -->
+        <div class="modal fade formRegistrar" id="agregarUsuario" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header d-flex flex-column">
+                        <h3 class="modal-title fs-5 text-success" id="exampleModalLabel">Registrar Usuario</h3>
+                        <p class="">Puedes registrar tu usuario delegandole un rol y un estado</p>
+                    </div>
+                    <form method="POST" asp- asp-controller="Administrador" asp-action="CreateNewUser">
+                        <div class="modal-body">
+                            <div class="campos">
+                                <div class="campo">
+                                    <label for="Nombre">Nombres</label>
+                                    <input type="text" id="Nombre" name="nombre" placeholder="Ingresa nombre y apellido del usuario." />
+                                    <span></span>
+                                </div>
+                                <div class="campo">
+                                    <label for="Cedula">Cedula</label>
+                                    <input type="number" id="Cedula" name="cedula" placeholder="Ingresa la cédula del usuario." />
+                                    <span></span>
+                                </div>
+                                <div class="campo">
+                                    <label for="Email">Email</label>
+                                    <input type="text" id="Email" name="email" placeholder="Ingresa un correo electrónico de contacto del usuario." />
+                                    <span></span>
+                                </div>
+                                <div class="campo">
+                                    <label for="Celular">Celular</label>
+                                    <input type="tel" id="Celular" name="celular" placeholder="Inserta un número de celular o telefono de contacto" />
+                                    <span></span>
+                                </div>
+                                <div class="campo">
+                                    <label for="Password">Contraseña</label>
+                                    <input type="password" id="Password" name="clave" placeholder="Asignale una contraseña segura al usuario" />
+                                    <span></span>
+                                </div>
+                                <div class="campo">
+                                    <label for="estado">Estado</label>
+                                    <select id="estado" name="estado">
+                                        <option disabled selected value="#">-- escoge un estado --</option>
+                                        <option value="activo">activo</option>
+                                        <option value="inactivo">inactivo</option>
+                                    </select>
+                                </div>
+                                <div class="campo">
+                                    <label for="rol">Asignar Rol</label>
+                                    <select id="rol" name="rol">
+                                        <option value="" selected>Seleccione un rol</option>
+                                        @foreach (var rol in Model.listaRoles)
+                                        {
+                                            <option value="@rol.rol_id">@rol.rol_descripcion</option>
+
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">Registrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    @{
+        if (this.TempData.ContainsKey("status") && this.TempData["status"] != null)
+        {
+            var resultado = this.TempData["status"];
+
+            if (resultado.Equals("registrar"))
+            {
+                <script>
+                    document.getElementById("btn-agregarUsuario").click();
+                </script>
+            }
+            else if (resultado.Equals("error editar") || resultado.Equals("error registrar"))
+            {
+                <script>
+
+                    swal({
+                        title: "Registro o Edicion Usuario",
+                        text: "El proceso de registro o edicion no se logro completar",
+                        icon: "error",
+                        button: "Cerrar"
+                    });
+                </script>
+            }
+            else if (resultado.Equals("completado editar") || resultado.Equals("completado registrar"))
+            {
+                <script>
+                    swal({
+                        title: "Registro o Edicion Usuario",
+                        text: "El proceso de registro o edicion se completo correctamente",
+                        icon: "success",
+                        button: "Cerrar"
+                    });
+                </script>
+            }
+            else
+            {
+                <script>
+                    document.getElementById(`btn-editar-${@resultado}`).click();
+                </script>
+            }
+
+            this.TempData.Remove("status");
+        }
+
+    }
+}
+

@@ -1,0 +1,129 @@
+﻿@model SIS_DIAF.Models.ModelViews.HistoricoViews
+
+@{
+    Layout = "_Layout2";
+    ViewData["Title"] = "Historico Regimen";
+}
+
+@section styles {
+    <link href="~/css/Historico.css" rel="stylesheet" />
+}
+
+<main class="contenido">
+    <div class="container">
+
+        @if ( User.IsInRole("logistica administrador"))
+        {
+            <a title="Regresar Al Regimen" class="btn p-0" asp-controller="LogisticaAdmin" asp-action="Index">
+                <img src="~/images/flecha-atras.png" width="50" />
+            </a>
+        }
+        else if (User.IsInRole("logística"))
+        {
+            <a title="Regresar Al Regimen" class="btn p-0" asp-controller="Logistica" asp-action="Index">
+                <img src="~/images/flecha-atras.png" width="50" />
+            </a>
+        }
+        else
+        {
+            <a title="Regresar Al Regimen" class="btn p-0" asp-controller="Upload" asp-route-cod="@Model.Guid" asp-action="Index">
+                <img src="~/images/flecha-atras.png" width="50"/>
+            </a>
+        }
+        <div class="section">
+            <div class="encabezado">
+                <h1>Historico Régimen</h1>
+                <p>Puedes revisar los documentos que fueron eliminados durante el proceso del régimen.</p>
+            </div>
+            <div class="info_regimen">
+                <p class="codigo text fs-8 d-flex">Régimen<span class="descripcion">@Model.Regimen</span></p>
+                <div class="separador"></div>
+                <p class="guid d-flex">Guid<span class="descripcion">@Model.Guid</span></p>
+            </div>
+        </div>
+
+        <div class="filtrador mb-3">
+            <div class="campos d-flex align-items-end">
+                <form asp-controller="Historico" asp-action="Index" method="get">
+                    <input type="hidden" name="guid" value="@Model.Guid" />
+                    <input type="hidden" name="nreg" value="@Model.Regimen" />
+                    <div class="campo w-100">
+                        <label class="form-label fw-bold text-black" for="tipoArchivo">Filtrar: <strong>Puedes filtrar tu búsqueda haciendo click en la seccion opciones ⬇️</strong></label>
+                        <select class="form-control text-center" id="tipoArchivo" name="filtro">
+                            <option disabled value="#" selected>📑Busca Tipo archivo</option>
+                            @foreach(var n in Model.tipoArchivo)
+                            {
+                                <option value="@n.tipo_nombre">@n.tipo_nombre</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="campo w-30">
+                        <button 
+                            title="Buscar por opcion seleccionada"
+                            type="submit"
+                            name="Tipo"
+                            value="Filtrar"
+                            class="btn btn-primary mt-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1);transform: ;msFilter:;"><path d="M9 16c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604-1.392-1.358a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.967 6.967 0 0 0 16 9c0-3.859-3.141-7-7-7S2 5.141 2 9s3.141 7 7 7z"></path></svg>
+                        </button>
+                        <button title="Cancelar Busquedas" type="submit" name="Tipo" value="Cancelar" class="btn btn-danger mt-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1);transform: ;msFilter:;"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm4.207 12.793-1.414 1.414L12 13.414l-2.793 2.793-1.414-1.414L10.586 12 7.793 9.207l1.414-1.414L12 10.586l2.793-2.793 1.414 1.414L13.414 12l2.793 2.793z"></path></svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row ms-0">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col" style="text-align:center;">Id</th>
+                        <th scope="col" style="text-align:center;">Tipo Archivo</th>
+                        <th scope="col" style="text-align:center;">Fecha</th>
+                        <th scope="col" style="text-align:center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var n in Model.historico)
+                    {                        
+                        <tr class="registro_codigo">
+                            <td scope="row">@n.historico_id</td>
+                            <td style="vertical-align:middle">@n.historico_tipoArchivo</td>
+                            <td style="vertical-align:middle">@n.historico_fecha</td>
+                            <td style="vertical-align:middle">
+                                <ul style="list-style-type:none;" class="d-flex flex-row align-items-center g-2 justify-content-evenly">
+                                    <li>
+                                        <button title="Ver Previsualizacion" type="button" value="@n.historico_archivoRuta" class="btn btn-outline-warning ms-4" id="boton-vista" data-bs-toggle="modal" data-bs-target="#modalpreview">
+                                            👁
+                                        </button>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<div class="modal fade modal-xl" id="modalpreview" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="tituloModalLabel"></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/previewpdf.js"></script>
+}

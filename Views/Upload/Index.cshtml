@@ -1,0 +1,611 @@
+﻿@{
+    Layout = "_Layout2";
+
+}
+@section styles {
+    <link rel="stylesheet" type="text/css" href="~/css/StyleUploadPage.css" />
+}
+
+<div class="Page-Form row">
+    @{
+        var regArchivos = (DtoViewRegimen)ViewBag.archivos;
+    }
+    <div class="col ">
+    </div>
+    <div class="col-10">
+
+        <div class="espacio">
+        </div>
+        @if (regArchivos.archivos.Count() > 0 && !regArchivos.codigo.Equals("sin_codigo") && !regArchivos.guid.Equals("sin_guid"))
+        {
+            string tipoRegs = regArchivos.archivos.First().TipoArchivo.TipoReg.nombre_tipo_reg;
+            string TipoControlador = "Regimens";
+
+            @if (User.IsInRole("logística"))
+            {
+                TipoControlador = "Logistica";
+            }
+            else if (User.IsInRole("logistica administrador"))
+            {
+                TipoControlador = "LogisticaAdmin";
+            }
+
+            <div class="cont-form">
+                <a title="Retroceder" asp-controller="@TipoControlador" asp-action="Index">
+                    <img width="45" src="~/images/flecha-atras.png" />
+                </a>
+
+                <h2>
+                    <br />
+                    Regimen: @regArchivos!.codigo
+                    <a title="Revisa Los Archivos Removidos" class="btn btn-primary" asp-controller="Historico" asp-route-guid="@regArchivos.guid" asp-route-nreg="@regArchivos.codigo" asp-action="Index">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1);transform: ;msFilter:;"><path d="M12 8v5h5v-2h-3V8z"></path><path d="M21.292 8.497a8.957 8.957 0 0 0-1.928-2.862 9.004 9.004 0 0 0-4.55-2.452 9.09 9.09 0 0 0-3.626 0 8.965 8.965 0 0 0-4.552 2.453 9.048 9.048 0 0 0-1.928 2.86A8.963 8.963 0 0 0 4 12l.001.025H2L5 16l3-3.975H6.001L6 12a6.957 6.957 0 0 1 1.195-3.913 7.066 7.066 0 0 1 1.891-1.892 7.034 7.034 0 0 1 2.503-1.054 7.003 7.003 0 0 1 8.269 5.445 7.117 7.117 0 0 1 0 2.824 6.936 6.936 0 0 1-1.054 2.503c-.25.371-.537.72-.854 1.036a7.058 7.058 0 0 1-2.225 1.501 6.98 6.98 0 0 1-1.313.408 7.117 7.117 0 0 1-2.823 0 6.957 6.957 0 0 1-2.501-1.053 7.066 7.066 0 0 1-1.037-.855l-1.414 1.414A8.985 8.985 0 0 0 13 21a9.05 9.05 0 0 0 3.503-.707 9.009 9.009 0 0 0 3.959-3.26A8.968 8.968 0 0 0 22 12a8.928 8.928 0 0 0-.708-3.503z"></path></svg>
+                        Ver historial
+                    </a>
+                    <h5>GUID: @regArchivos.guid</h5>
+
+                    <hr />
+                    <div class="no-completo mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-dash-circle-fill" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z" />
+                        </svg>
+                        Pendiente por subir
+                    </div>
+
+                    <div class="completo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                        </svg>
+                        Completado o Subido
+                    </div>
+                    <hr />
+                </h2>
+                <div class="alert alert-success text-uppercase text-center" role="alert">
+                    TIPO DEL PROCESO ACTUAL : <strong style="font-size:23px;">@tipoRegs</strong>
+                </div>
+
+                @if (User.IsInRole("finanzas") || User.IsInRole("jurídico"))
+                {
+                    <div class="alert alert-warning text-uppercase text-center" role="alert">
+                        Tu proceso es activado cuando <strong>@(User.IsInRole("finanzas") ? "ACTA ENTREGA RECEPCIÓN" : "SOLICITUD ADQUISICIÓN EXTERIOR")</strong> se haya subido exitosamente
+                    </div>
+                }
+                <div class="accordion" id="accordionExample">
+
+                    @if (User.IsInRole("logística"))
+                    {
+
+                        var archRlogis = (List<Archivo>) ViewBag.archivLogistica;
+                        <div class="alert alert-warning d-flex gap-1 flex-column align-items-center justify-content-center" role="alert">
+                            <div class="w-100 text-center">
+                                <span style="font-size:25px;">🧑‍💼</span>
+                                @{
+                                    var usuario = archRlogis[^1].Regimen.responsableRegimen.Where(u => u.usuario.Rol.rol_descripcion.Equals("responsable")).FirstOrDefault();
+                                    string nombre = "";
+                                    if(usuario != null)
+                                    {
+                                        nombre = usuario.usuario.usuario_nombre!;
+                                    }
+                                }
+                                <strong class="text-capitalize">Responsable del regimen: @nombre </strong>
+                            </div>  
+                        </div>
+                        @foreach (var nArch in archRlogis)
+                        {
+                            <div class="accordion-item">
+
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@String.Concat("collapse", nArch.archivo_id)" aria-expanded="false" aria-controls="collapseOne">
+                                        <div class="etiqueta-form">
+                                            <strong>
+                                                @nArch.TipoArchivo.tipo_nombre
+                                            </strong>
+
+                                            <div class="no-completo">
+                                                <!-- <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-dash-circle-fill" viewBox="0 0 16 16">
+                                                     <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z"></path>
+                                                  </svg>-->
+                                            </div>
+                                        </div>
+                                    </button>
+                                </h2>
+
+                                <div id="@String.Concat("collapse",nArch.archivo_id)" class="accordion-collapse collapse" data-bs-parent="#accordionExample" style="">
+
+                                    <div class="accordion-body w-100">
+
+                                        <div class="input-group mb-3 d-block">
+                                            
+                                            <div>
+                                                    @if (nArch.archivo_ruta != null && nArch.fecha_subida != null)
+                                                    {
+                                                        <div class="alert alert-light" role="alert">
+                                                            <h4 class="alert-heading">
+                                                                @nArch.archivo_nombre
+                                                                <button title="Previsualizar Archivo" type="button" value="@nArch.archivo_ruta" class="btn btn-outline-warning ms-4" id="boton-vista" data-bs-toggle="modal" data-bs-target="#modalpreview">
+                                                                    👁
+                                                                </button>
+                                                            </h4>
+                                                            <p> <i>Ultima fecha de modificacion:</i> @nArch.fecha_subida</p>
+                                                            <hr>
+                                                            <p class="mb-0">GUID: @nArch.archivo_guid</p>
+                                                        </div>
+                                                    }else{
+                                                         <div class="alert alert-danger text-center text-uppercase" role="alert">
+                                                                 Aun no sea cargado el archivo por parte del Responsable
+                                                         </div>
+                                                    }
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        
+                        }
+                    }
+
+                    @foreach (var arch in (List<Archivo>)regArchivos!.archivos)
+                    {
+                        <div class="accordion-item">
+                            @if (arch.archivo_estado.Equals("pendiente")
+                           || arch.archivo_estado.Equals("subido"))
+                            {
+                                <form id="form-archivo_@arch.archivo_estado" asp-controller="Upload" asp-route-Perfiltipo="@(User.IsInRole("logistica administrador") ? "logistica administrador" : "")" asp-action="GuardarArchivo" method="post" enctype="multipart/form-data">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@String.Concat("collapse", arch.archivo_id)" aria-expanded="false" aria-controls="collapseOne">
+                                            <div class="etiqueta-form">
+                                                <strong>
+                                                    @arch.TipoArchivo.tipo_nombre
+                                                </strong>
+
+                                                @if (!arch.archivo_estado.Equals("subido"))
+                                                {
+                                                    <div class="no-completo">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-dash-circle-fill" viewBox="0 0 16 16">
+                                                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z" />
+                                                        </svg>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="completo">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                                                        </svg>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="@String.Concat("collapse",arch.archivo_id)" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+
+
+                                        <div class="accordion-body">
+                                            @{
+
+
+                                                @if (arch.fecha_subida != null)
+                                                {
+
+                                                    <div class="alert alert-light" role="alert">
+                                                        <h4 class="alert-heading">
+                                                            @arch.archivo_nombre
+                                                            <button title="Previsualizar Archivo" type="button" value="@arch.archivo_ruta" class="btn btn-outline-warning ms-4" id="boton-vista" data-bs-toggle="modal" data-bs-target="#modalpreview">
+                                                                👁
+                                                            </button>
+                                                        </h4>
+                                                        <p> <i>Ultima fecha de modificacion:</i> @arch.fecha_subida</p>
+                                                        <hr>
+                                                        <p class="mb-0">GUID: @arch.archivo_guid</p>
+                                                    </div>
+                                                }
+                                            }
+
+                                            @if (!User.IsInRole("supervisor") &&
+                                           !User.IsInRole("usuario final") &&
+                                           !(User.IsInRole("logistica administrador") &&
+                                           !arch.TipoArchivo.TipoReg.nombre_tipo_reg.Equals("LOGISTICA")) &&
+                                           !(User.IsInRole("responsable") &&
+                                           !arch.TipoArchivo.TipoReg.nombre_tipo_reg.Equals("GENERAL")) && 
+                                           !(User.IsInRole("responsable") && 
+                                            arch.TipoArchivo.tipo_nombre.Equals("LIQUIDACIÓN")) &&
+                                           !(User.IsInRole("responsable") &&
+                                            arch.TipoArchivo.tipo_nombre.Equals("CONTRATO FAE-DIAF"))
+                                           )
+                                            {
+                                                <div class="input-group mb-3">
+
+                                                    @if (@arch.archivo_ruta != null)
+                                                    {
+                                                        <input type="hidden" name="tipo" value="actualizar" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="hidden" name="tipo" value="agregar" />
+                                                    }
+
+                                                    <input hidden name="id_archivo" value="@arch.archivo_id" />
+                                                    <input hidden name="guid_a" value="@arch.archivo_guid" />
+                                                    <input hidden name="guid_r" value="@regArchivos.guid" />
+
+                                                    @if (User.IsInRole("logistica administrador"))
+                                                    {
+                                                        <input hidden name="tipoNombreArchivo" value="@arch.tipoNombre" />
+
+                                                    }
+
+
+                                                    <div class="d-flex flex-column w-100">
+                                                        <p class="d-block fw-bold">Selecciona Archivo De Subida</p>
+                                                        <div class="d-flex gap-1">
+                                                            <div class="w-100 p-1" style="border:1px solid rgba(0 0 0 / .2); border-radius: 10px" id="textoArchivoSeleccionado">
+                                                                <button id="btn_@arch.archivo_guid" title="Escoga El Archivo Para Subir o Reemplazar" type="button" class="btn btn-success botonParaSubidaArchivo">
+                                                                    📁
+                                                                    Selecciona Archivo
+                                                                </button>
+                                                                <strong id="descripcion_btn_@arch.archivo_guid" class="fw-lighter px-2">
+                                                                    Ningun Archivo Seleccionado
+                                                                </strong>
+                                                            </div>
+                                                            <input id="inputFile_btn_@arch.archivo_guid" style="border: 1px solid rgba( 0 0 0 / .7);border-top-left-radius:5px; border-bottom-left-radius: 5px" type="file" class="form-control d-none" name="file" placeholder="Cargar archivo" aria-label="Suba un archivo .PDF" aria-describedby="button-addon2">
+                                                            <button title="Guardar Archivo" class="btn btn-outline-secondary btn-warning" type="submit" id="button-addon2">💾</button>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            }
+                                            else if (
+                                            User.IsInRole("supervisor") ||
+                                            User.IsInRole("usuario final") ||
+                                            (User.IsInRole("logistica administrador") &&
+                                            !arch.TipoArchivo.TipoReg.nombre_tipo_reg.Equals("LOGISTICA")) ||
+                                            (User.IsInRole("responsable") &&
+                                            !arch.TipoArchivo.TipoReg.nombre_tipo_reg.Equals("GENERAL")) ||
+                                            (User.IsInRole("responsable") &&
+                                            arch.TipoArchivo.tipo_nombre.Equals("LIQUIDACIÓN")) ||
+                                            (User.IsInRole("responsable") &&
+                                            arch.TipoArchivo.tipo_nombre.Equals("CONTRATO FAE-DIAF"))
+                                            )
+                                            {
+                                                if (arch.archivo_estado.Equals("pendiente"))
+                                                {
+                                                    <div class="alert alert-danger" role="alert">
+                                                        <img width="30" src="~/images/senal-de-alerta.png" />
+                                                        @if (arch.TipoArchivo.tipo_nombre.Equals("CONTRATO FAE-DIAF"))
+                                                        {
+                                                            <strong>
+                                                                Para continuar, el responsable de JURIDICO debe completar este proceso
+                                                            </strong>
+                                                        }
+                                                        else if (arch.TipoArchivo.tipo_nombre.Equals("LIQUIDACIÓN") )
+                                                        {
+                                                            <strong>
+                                                                Para continuar, el responsable de FINANZAS debe completar este proceso
+                                                            </strong>
+                                                        }
+                                                        else
+                                                        {
+                                                            <strong>Archivo pendiente para subir</strong>
+                                                        }
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </form>
+                            }
+                            else
+                            {
+                                <form>
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@String.Concat("collapse", arch.archivo_id)" aria-expanded="false" aria-controls="collapseOne">
+                                            <div class="etiqueta-form">
+                                                <strong>
+                                                    @arch.TipoArchivo.tipo_nombre
+                                                </strong>
+
+                                                <div class="no-completo">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-dash-circle-fill" viewBox="0 0 16 16">
+                                                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+
+                                        </button>
+                                    </h2>
+
+                                    @if (!User.IsInRole("supervisor") &&
+                                   !User.IsInRole("usuario final") &&
+                                   !(User.IsInRole("logistica administrador") &&
+                                   !arch.TipoArchivo.TipoReg.nombre_tipo_reg.Equals("LOGISTICA")) &&
+                                   !(User.IsInRole("responsable") &&
+                                   !arch.TipoArchivo.TipoReg.nombre_tipo_reg.Equals("GENERAL")) &&
+                                   !(User.IsInRole("responsable") &&
+                                   arch.TipoArchivo.tipo_nombre.Equals("LIQUIDACIÓN")) &&
+                                   !(User.IsInRole("responsable") &&
+                                   arch.TipoArchivo.tipo_nombre.Equals("CONTRATO FAE-DIAF"))
+                                   )
+                                    {
+
+                                        <div id="@String.Concat("collapse",arch.archivo_id)" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                            <div class="accordion-body">
+                                                <div class="input-group mb-3">
+                                                    <input type="file" class="form-control" disabled name="file" placeholder="Cargar archivo" aria-label="Suba un archivo .PDF" aria-describedby="button-addon2">
+                                                    <button class="btn btn-outline-secondary" disabled type="submit" id="button-addon2">Subir</button>
+                                                    <button type="button" class="btn btn-success" disabled data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                                        👁
+                                                    </button>
+                                                </div>
+                                                <div class="row d-flex flex-row align-items-center">
+
+                                                    <div class="col-2">
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else if (User.IsInRole("supervisor") ||
+                                    User.IsInRole("usuario final") ||
+                                    (User.IsInRole("logistica administrador") &&
+                                    !arch.TipoArchivo.TipoReg.nombre_tipo_reg.Equals("LOGISTICA")) ||
+                                    (User.IsInRole("responsable") &&
+                                    !arch.TipoArchivo.TipoReg.nombre_tipo_reg.Equals("GENERAL")) ||
+                                    (User.IsInRole("responsable") &&
+                                    arch.TipoArchivo.tipo_nombre.Equals("LIQUIDACIÓN")) ||
+                                    (User.IsInRole("responsable") &&
+                                    arch.TipoArchivo.tipo_nombre.Equals("CONTRATO FAE-DIAF"))
+                                    )
+                                    {
+                                        <div id="@String.Concat("collapse",arch.archivo_id)" class="alert alert-danger m-3 accordion-collapse collapse" data-bs-parent="#accordionExample" role="alert">
+                                            <img width="30" src="~/images/senal-de-alerta.png" />
+
+                                            <strong>Archivo pendiente para subir</strong>
+                                        </div>
+                                    }
+                                </form>
+                            }
+                        </div>
+
+
+                        if (
+                                    ViewBag.archivLogistica != null &&
+                                    ViewBag.tipoSubArchivos != null &&
+                                    !User.IsInRole("finanzas") && 
+                                    !User.IsInRole("logistica administrador") &&
+                                    !User.IsInRole("logística"))
+                        {
+                            //Tenemos que ordenar la parte de Logistica, despues de REQUERIMIENTO
+
+                            if (!User.IsInRole("logistica administrador") &&
+                            @arch.TipoArchivo.tipo_nombre.Equals("REQUERIMIENTO"))
+                            {
+                                var dataArchLogistc = (Regimen)ViewBag.archivLogistica;
+                                var tipoSubArchivos = (List<string>)ViewBag.tipoSubArchivos;
+                                float progreso = dataArchLogistc.getProgreso();
+                                if (dataArchLogistc.Archivos.Count > 0)
+                                {
+                                    <div class="accordion-item">
+
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse100" aria-expanded="false" aria-controls="collapseOne">
+                                                <div class="etiqueta-form">
+                                                    <strong>
+                                                        LOGISTICA
+                                                    </strong>
+
+                                                    <div class="no-completo">
+                                                        <!-- <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-dash-circle-fill" viewBox="0 0 16 16">
+                                                             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z"></path>
+                                                          </svg>-->
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        </h2>
+
+                                        <div id="collapse100" class="accordion-collapse collapse" data-bs-parent="#accordionExample" style="">
+
+                                            <div class="accordion-body w-100">
+
+                                                <div class="input-group mb-3 d-block">
+                                                    <div class="alert alert-warning d-flex gap-1 flex-column align-items-center justify-content-center" role="alert">
+                                                        <div class="w-100 text-center">
+                                                            <span style="font-size:25px;">🧑‍💼</span>
+                                                            <strong class="text-capitalize">Porcentaje subida archivos - Supervisor Logistica</strong>
+                                                        </div>
+                                                        <div class="progress w-100" style="width:180px; height:20px" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                                            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: @progreso%">
+                                                                @progreso% completado
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        @if (tipoSubArchivos.Count().Equals(0))
+                                                        {
+                                                            <div class="alert alert-danger text-center text-uppercase" role="alert">
+                                                                Logistica todavia no tiene un <strong>responsable</strong> para los procesos de <strong>BIEN, MANTENIMIENTO o SERVICIO</strong>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="alert alert-success text-center text-uppercase d-flex gap-2 align-items-center justify-content-between" role="alert">
+                                                                <div class="w-100">
+                                                                    <p class="m-0 text-capitalize text-lg-start fw-bold">Porcentaje subida archivos - @tipoSubArchivos[0]</p>
+                                                                    <div class="progress w-100" style="width:180px; height:20px" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                                                        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: @tipoSubArchivos[2]%">
+                                                                            @tipoSubArchivos[2]% completado
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <p class="m-0">Este proceso es del tipo <strong>@tipoSubArchivos[0]</strong></p>
+                                                                <a title="Hacer Seguimiento Proceso @tipoSubArchivos[0]" class="btn btn-outline-warning" asp-controller="Upload" asp-route-cod="@arch.Regimen.regimen_guid" asp-action="obtenerArchivosLogistica">👁‍🗨</a>
+                                                            </div>
+                                                            <div class="alert alert-primary text-uppercase" style="font-size:14px;">
+                                                                responsable de <strong>@tipoSubArchivos[0]</strong> : <strong>@tipoSubArchivos[3]</strong>
+                                                            </div>
+                                                        }
+
+                                                        @foreach (var nArch in dataArchLogistc.Archivos)
+                                                        {
+                                                            if (nArch.archivo_ruta != null && nArch.fecha_subida != null)
+                                                            {
+                                                                <div class="alert alert-light" role="alert">
+                                                                    <h4 class="alert-heading">
+                                                                        @nArch.archivo_nombre
+                                                                        <button title="Previsualizar Archivo" type="button" value="@nArch.archivo_ruta" class="btn btn-outline-warning ms-4" id="boton-vista" data-bs-toggle="modal" data-bs-target="#modalpreview">
+                                                                            👁
+                                                                        </button>
+                                                                    </h4>
+                                                                    <p> <i>Ultima fecha de modificacion:</i> @nArch.fecha_subida</p>
+                                                                    <hr>
+                                                                    <p class="mb-0">GUID: @nArch.archivo_guid</p>
+                                                                </div>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                }
+
+                            }
+                            
+                        }
+
+                    }
+
+                </div>
+            </div>
+        }   
+        else
+        {
+            <div class="alert alert-danger mt-5" role="alert">
+                <h4 class="alert-heading">Ha ocurrido un Error!</h4>
+                <p>Hubo un error al consultar el regimen, probablemente se trato de corromper el regimen</p>
+                <hr>
+                <p class="mb-0">Comuniquese con soporte de TI.</p>
+                @if (!User.IsInRole("logística") && !User.IsInRole("logistica administrador"))
+                {
+                    <a class="btn btn-danger" asp-controller="Regimens" asp-action="Index">Regresar</a>
+                }
+                @if (User.IsInRole("logística"))
+                {
+                    <a class="btn btn-danger" asp-controller="Logistica" asp-action="Index">Regresar</a>
+                }
+                @if(User.IsInRole("logistica administrador"))
+                {
+                     <a class="btn btn-danger" asp-controller="LogisticaAdmin" asp-action="Index">Regresar</a>    
+                }
+             </div>
+        }
+    </div>
+    <div class="col">
+    </div>
+</div>
+
+<div class="modal fade modal-xl" id="modalpreview" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="tituloModalLabel"></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@if (ViewBag.Errores != null)
+{
+    var err = (string[])ViewBag.Errores;
+    string text = "";
+    foreach (var e in err)
+    {
+        text += e;
+    }
+    <script>
+        console.log(document.querySelector("#cedula"));
+
+        swal({
+            title: "A ocurrido un error",
+            text: "@text",
+            icon: "error",
+            button: "Cerrar"
+        });
+    </script>
+    ViewBag.Errores = null;
+}
+@if (ViewBag.Exito != null)
+{
+    var succ = (bool)ViewBag.Exito;
+    if (succ)
+    {
+        <script>
+            console.log(document.querySelector("#cedula"));
+
+            swal({
+                title: "Proceso exitoso",
+                text: "Se cargo el archivo correctamente",
+                icon: "success",
+                button: "Cerrar"
+            });
+        </script>
+    }
+    ViewBag.Exito = null;
+}
+@section Scripts {
+
+    <script src="~/js/previewpdf.js"></script>
+    <script src="~/js/Advertencia.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", (e) => {
+            let exito = document.getElementById("SeccionMensajeSuccess");
+            let error = document.getElementById("SeccionMensajeDanger");
+
+            if (exito) {
+                window.location.href = "#SeccionMensajeSuccess";
+            }
+
+            if (error) {
+                window.location.href = "#SeccionMensajeDanger";
+            }
+        });
+
+        let botonSubida = document.querySelectorAll(".botonParaSubidaArchivo");
+        botonSubida.forEach(btn => {
+
+            btn.onclick = (e) => {
+                let idBoton = e.target.id;
+                let inputFile = document.querySelector(`#inputFile_${idBoton}`);
+                let descripcion = document.querySelector(`#descripcion_${idBoton}`);
+
+                inputFile.click();
+
+            };
+
+        });
+
+        let inpFile = document.querySelectorAll("input[type=file]");
+
+        inpFile.forEach(file => {
+            file.addEventListener("change", (e) => {
+                let nombreArchivo = e.target.files[0].name;
+                let idInput = e.target.id;
+
+                let idDescripcion = "descripcion_" + idInput.split("_")[1] + "_" + idInput.split("_")[2];
+                let campoDescripcion = document.querySelector(`#${idDescripcion}`);
+                campoDescripcion.textContent = nombreArchivo;
+            });
+        });
+
+    </script>
+}

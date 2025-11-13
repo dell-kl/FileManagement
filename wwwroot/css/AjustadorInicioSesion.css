@@ -1,0 +1,63 @@
+﻿@media ( max-width: 600px )
+{
+    
+}
+
+@media ( max-width: 768px )
+{
+    .InicioSesion .formulario p {
+        padding: 0px 10px;
+    }
+
+    .formulario {
+        width: 100% !important;
+    }
+    
+    /* modificacion fondo de pantalla */
+    .imagen {
+        background-size: 240% 100%;
+    }
+}
+
+@media ( max-width: 1024px )
+{
+    
+    .formulario {
+        width: 100% !important;
+    }
+
+}
+
+@media ( max-width: 1200px )
+{
+    .InicioSesion .formulario p {
+        padding: 5px;
+    }
+
+    .InicioSesion .campos .campo:nth-child(1),
+    .InicioSesion .campos .campo:nth-child(2){
+        padding: 10px !important;
+    }
+}
+
+@media ( min-width: 1205px )
+{
+    .InicioSesion .campos .campo:nth-child(1),
+    .InicioSesion .campos .campo:nth-child(2)
+    {
+        padding: 5px 20px !important;
+    }
+}
+
+@media ( max-width: 1300px )
+{
+    .InicioSesion .formulario p {
+        font-size: .8rem;
+    }
+
+    .InicioSesion .campos .campo:nth-child(1)
+    .InicioSesion .campos .campo:nth-child(2)
+    {
+        background-color: blue;
+    }
+}

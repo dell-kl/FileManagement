@@ -1,0 +1,17 @@
+﻿.contenido {
+    margin-bottom: 10px;
+    min-height : 100vh;
+
+    .container {
+        padding-top: 6%;
+        padding-bottom: 2%;
+        background-color: rgb(255, 255, 255);
+        min-height: 100vh;
+
+        p {
+          color: rgba( 0 0 0 / .5);
+        }
+
+
+    }
+}

@@ -1,0 +1,100 @@
+﻿.activo {
+    background-color: rgb(59 201 59);
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+    padding: 0.4rem;
+    border-radius: .9rem;
+    width: 7rem;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.desactivado {
+    background-color: rgb(230 23 23);
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+    padding: 0.4rem;
+    border-radius: .9rem;
+    width: 7rem;
+    text-align: center;
+    margin: 0 auto;
+}
+
+a {
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+}
+
+h1 {
+    text-align: center;
+    color: #305494;
+    font-weight: bold;
+    font-size: 2rem;
+    text-transform: uppercase;
+    padding: 1rem;
+}
+
+.navbar { position: unset; }
+
+.descripcion-empresa {
+    width: 98%;
+    border-radius: 5px;
+
+    .descripcion-empresa-contenido
+    {
+        p {
+            padding: 1rem 4rem;
+        }
+
+        .proposito-imagen {
+            width: 12%;
+            margin: 0 auto;
+
+            img
+            {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+}
+
+
+/* Estiilos para la seccion de crear nuevo usuario */
+.crearUsuario {
+    width:97%;
+    border-radius:5px;
+    }
+    .formRegistrar,
+    .formEditar {
+        .campos {
+            .campo {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                margin-bottom:15px;
+
+                label {
+                    font-weight: bold;          
+                }
+
+                input,select
+                {
+                    border: 1px solid rgba(0 0 0 / .3);
+                    border-radius: .2rem;
+                    padding: 1rem;
+
+                }
+
+            }
+        }
+        button {
+            width:auto;
+        }
+    }
+}
+
+
+/*
+    Crearemos la parte de nuestra pie de pagina
+*/

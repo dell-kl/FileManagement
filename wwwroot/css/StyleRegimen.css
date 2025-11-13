@@ -1,0 +1,62 @@
+﻿.navbar {
+    position: unset;
+}
+
+.tablaRegimens 
+{
+    height: 25.5rem;
+}
+
+.container {
+    background: #fff;
+    min-width: 98%;
+    border-radius: 4px;
+    padding: 17px 2px 13px 2px;
+    .table{
+        
+       
+        & thead{
+                border : 1px solid #dfdfdd;
+                text-align:center;
+               }
+
+        & tbody{
+            text-align: center;
+        }
+    }
+}
+
+
+.no-completo {
+    color: #999;
+}
+
+.completo {
+    color: rgb(25,135,84);
+}
+
+.ionicon-ubicacion {
+    width: 20px;
+    height: 20px;
+    color: #A60303;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.info-card {
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+}
+
+.info-card h5 {
+color: #444;
+}
+
+.info-card h5.secondary {
+    color: #999;
+}
+

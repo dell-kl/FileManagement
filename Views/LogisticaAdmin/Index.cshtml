@@ -1,0 +1,247 @@
+﻿@using SIS_DIAF.Security;
+@inject EncriptacionPass security;
+
+@model SIS_DIAF.Models.ModelViews.RegimenCompletadosModelView
+
+@{
+    Layout = "_Layout2";
+    ViewData["Title"] = "Panel Gestion Logistica";
+
+    string estado = ViewBag.estado;
+    
+    string tipo = TempData["tipo"]!.ToString()!;
+    string entrada = TempData["entrada"]!.ToString()!;
+}
+
+@section styles {
+    <link href="~/css/adminLogistc.css" rel="stylesheet" />
+}
+
+<div class="logisticaAdministrador m-auto">
+    <div class="tablero p-2" style="border-radius: 5px;">
+        
+        @if (estado.Equals("correcto"))
+        {            
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <p style="margin:0;">Se ha logrado asignar correctamente a un representante del proceso.</p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        else if (estado.Equals("incorrecto"))
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <p style="margin:0">Hubo un error en la asignacion del proceso.</p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="alert alert-danger" role="alert">
+            Para asignar un delegado <strong>responsable de logistica</strong> al régimen, debes subir primero los archivos : <strong>Cotización, Cuadro Comparativo, Proforma</strong>
+        </div>
+        
+        <div class="d-flex flex-row gap-1 align-items-center mb-4">
+            <img src="~/images/iconos/menos.png" width="20" />
+            <p class="m-0" style="color:tomato">Por asignar responsable de subida de archivos de <strong>Bien</strong>, <strong>Mantenimiento</strong> o <strong>Servicio</strong></p>
+        </div>
+
+        <div class="d-flex justify-content-between mb-2">
+
+            <p class="fw-bold">El administrador de logistica puede asignar responsables para Bien, Mantenimiento y Servicio</p>
+
+            <form id="formularioBusqueda" asp-controller="LogisticaAdmin" method="post" asp-action="FiltrarListaRegimens">
+                <div class="buscadorPorCampo d-flex align-items-center gap-1">
+
+                    <select name="tipo" class="form-select tipoBusqueda" aria-label="Default select example">
+                        <option selected disabled>-- 📃 Filtrar Por --</option>
+                        
+                        <option value="1"> 🎯 Descripcion</option>
+                        
+                    </select>
+              
+                    <div class="input-group">
+                        <input type="text" value="" name="entrada" class="form-control entradaBusqueda" style="width:60%" placeholder="🔎 Busca mas rapido escogiendo un tipo de busqueda" aria-describedby="basic-addon1">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary loadingBtn">Buscar</button>
+                
+                </div>
+            </form>
+
+        </div>
+
+        <div style="overflow-y: auto; height: 24.2rem;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-center">Id</th>
+                        <th scope="col" class="text-center">Codigo Reg.</th>
+                        <th scope="col" class="text-center">Guid Reg.</th>
+                        <th scope="col" class="text-center">Fecha Creacion</th>
+                        <th scope="col" class="text-center">🎯Descripcion</th>
+                        <th scope="col" class="text-center">Estado</th>
+                        <th scope="col" class="text-center"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if ( Model.regimenes.Count > 0 )
+                    {
+                        @foreach(var data in Model.regimenes)
+                        {
+                            int numeroArchivosSubidosRegimen = data.Archivos.Where(n => n.archivo_ruta != null).Count();
+
+                            <tr>
+                                <td class="text-center" style="vertical-align:middle;">
+                                    @data.regimen_id
+                                </td>
+                                <td class="text-center" style="vertical-align:middle;">
+                                    @data.regimen_cod
+                                </td>
+                                <td class="text-center" style="vertical-align:middle;">
+                                    @data.regimen_guid
+                                </td>
+                                <td class="text-center" style="vertical-align:middle;">
+                                    @data.regimen_fecha_creacion
+                                </td>
+                                <td class="text-center" style="vertical-align:middle;">
+                                    @data.regimen_objetivo
+                                </td>
+                                <td class="text-center" style="vertical-align:middle;">
+                                    <img src="~/images/iconos/menos.png" width="35" />
+                                </td>
+                                <td class="text-center" style="vertical-align:middle;">
+                                    <div class="d-flex gap-1">
+
+                                        <button @(!numeroArchivosSubidosRegimen.Equals(3) ? "disabled" : "") title="delegar responsable" type="button" class="btn @(!numeroArchivosSubidosRegimen.Equals(3) ? "btn-secondary" : "btn-warning")" data-bs-toggle="modal" data-bs-target="#delegarResponsable_@data.regimen_guid">
+                                            <img src="~/images/iconos/delegar.png" width="35"/>
+                                        </button>
+                                        <a title="Subir Archivos Logistica" class="btn btn-outline-warning" style="font-size:22px;" asp-controller="Upload" asp-route-cod="@data.regimen_guid" asp-action="ObtenerArchivosResponsable">📤</a>
+
+                                    </div>
+                                    <div class="modal fade" id="delegarResponsable_@data.regimen_guid" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Proceso Asignacion</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form method="POST" asp-controller="LogisticaAdmin" asp-action="RegistrarResponsable">
+                                                <div class="modal-body">
+                                                        <input type="hidden" name="GuidRegimen" value="@data.regimen_guid" />
+                                                        <input type="hidden" name="CodeRegimen" value="@data.regimen_cod"/>
+                                                        <div class="campo">
+                                                            <label for="Responsable" class="fw-bold pb-2">Asigna un responsable de logistica</label>
+                                                            <select class="form-control responsable_@data.regimen_guid" name="IdUsuarioLogistica" id="@data.regimen_guid">
+                                                                <option style="color:rgba( 0 0 0 / .2)" id="descripcionResponsable" value="#" disabled selected>
+                                                                    Selecciona una entidad responsable
+                                                                </option>
+                                                                @foreach (var n in Model.usuarios)
+                                                                {
+                                                                    <option value="@n.usuario_id"><strong>@n.usuario_nombre</strong> - @n.Sucursal.sucursal_nombre</option>
+                                                                }
+                                                            </select>
+                                                            <span id="alerta_responsable_@data.regimen_guid" style="border-radius:5px" class="bg-danger text-white mt-2 d-block p-1 fw-bold">Selecciona un responsable para continuar</span>
+                                                        
+                                                        </div>
+                                                        <div class="campo mt-3">
+                                                            <label for="tipoProceso" class="fw-bold pb-2">Selecciona la categoria para el proceso</label>
+                                                            <select class="form-control tipoRegimen_@data.regimen_guid" name="IdTipoRegimen" id="@data.regimen_guid">
+                                                                <option style="color:rgba( 0 0 0 / .2)" selected value="#" disabled>
+                                                                    Selecciona una de las categorias
+                                                                </option>
+                                                                
+                                                                @foreach(var n in Model.tipoRegs)
+                                                                {
+                                                                    <option value="@n.tiporeg_id">@n.nombre_tipo_reg</option>
+                                                                }
+                                                            </select>
+                                                            <span id="alerta_tipoRegimen_@data.regimen_guid" style="border-radius:5px" class="bg-danger text-white mt-2 d-block p-1 fw-bold">Selecciona una categoria para el proceso</span>
+                                                        </div>
+                                                    </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="submit" id="boton_@data.regimen_guid" class="btn btn-success AsignacionBoton" disabled>Continuar</button>
+                                                </div>
+                                                </form>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="acciones-paginador" style="margin:10px auto 0 auto;width:100%;">
+            <a class="btn btn-warning loadingPayload" asp-action="Index" asp-controller="LogisticaAdmin">🏠 Inicio</a>
+
+            @if (security.DesencriptarUrl(entrada).Equals("vacio") && security.DesencriptarUrl(tipo).Equals("0"))
+            {
+                <a asp-controller="LogisticaAdmin" asp-action="Index" asp-route-direccion="@( security.EncriptrarUrl("atras") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )-1).ToString()) )" aria-disabled="@TempData["b-back"]" class="btn btn-primary @TempData["b-s-back"] loadingPayload">⬅️ Atras</a>
+                <a asp-controller="LogisticaAdmin" asp-action="Index" asp-route-direccion="@( security.EncriptrarUrl("siguiente") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )+1).ToString()) )" aria-disabled="@TempData["b-next"]!.ToString()" class="btn btn-primary @TempData["b-s-next"] loadingPayload">Siguiente ➡️</a>
+            }
+            else
+            {
+                <a asp-controller="LogisticaAdmin" asp-action="Index" asp-route-tipo="@tipo" asp-route-entrada="@entrada" asp-route-direccion="@( security.EncriptrarUrl("atras") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )-1).ToString()) )" aria-disabled="@TempData["b-back"]" class="btn btn-primary @TempData["b-s-back"] loadingPayload">⬅️ Atras</a>
+                <a asp-controller="LogisticaAdmin" asp-action="Index" asp-route-tipo="@tipo" asp-route-entrada="@entrada" asp-route-direccion="@( security.EncriptrarUrl("siguiente") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )+1).ToString()) )" aria-disabled="@TempData["b-next"]!.ToString()" class="btn btn-primary @TempData["b-s-next"] loadingPayload">Siguiente ➡️</a>
+            }
+            
+        </div>
+    </div>
+</div>
+
+<script src="~/js/ValidarFormsRegimen.js"></script>
+
+@section Scripts
+{
+
+    <script>
+        (() => { 
+            let selects = document.querySelectorAll("select");
+            let formulario = { "IdUsuarioLogistica": 0, "IdTipoRegimen": 0 };
+            selects.forEach(select => { 
+                select.addEventListener("change", (e) => { 
+                    let name = e.target.name;
+                    let id = e.target.classList.values();
+                    let id2 = e.target.id;
+                    let codg = "";
+                    for (let value of id) { 
+                        if (name === "IdUsuarioLogistica") {
+                            if (/^responsable_/.test(value)) {
+                                codg = value;
+                            } 
+                        }
+                        else if (name === "IdTipoRegimen") {
+                            if (/^tipoRegimen_/.test(value)) {
+                                codg = value;
+                            } 
+                            
+                        }
+                    }
+                    if ( codg !== "" )
+                    {
+                        formulario[name] = 1;
+                        let alerta = document.getElementById(`alerta_${codg}`);
+                        alerta.classList.remove("d-block");
+                        alerta.classList.add("d-none");
+                        if (formulario.IdUsuarioLogistica == 1 && formulario.IdTipoRegimen == 1) { 
+                            let botonEnviar = document.getElementById(`boton_${id2}`);
+                            if ( botonEnviar )
+                            {
+                                botonEnviar.disabled = false;
+                            }
+                            formulario.IdUsuarioLogistica = 0;
+                            formulario.IdTipoRegimen = 0;
+                        }
+                    }
+
+                });
+            });
+        })();
+
+
+    </script>
+}

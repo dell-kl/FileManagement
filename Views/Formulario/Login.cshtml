@@ -1,0 +1,111 @@
+﻿@model SIS_DIAF.DTO.LoginDto;
+@{ ViewData["Title"] = "Inicio Sesión"; }
+
+
+@section styles{
+    <style>
+        /*
+        estilos para la parte de nuestra imagen del cual lo vamos a editar.
+        */
+
+        body,html
+        {
+        margin:0;
+        padding:0;
+        height:100%;
+        }
+
+        .imagen {
+        background: url(../images/Fondo-DIAF.jpg);
+        background-repeat: no-repeat;
+        background-size: 116% 100%;
+        background-position: center;
+        width: 101%;
+        height: 100%;
+        }
+    </style>
+
+    <link rel="stylesheet" href="~/css/AjustadorInicioSesion.css" />
+    <link rel="stylesheet" href="~/css/estiloLogin.css"  />
+}
+
+<div class="InicioSesion">
+
+    <div class="imagen"></div>
+
+    <div class="formulario section d-flex flex-column justify-content-center align-items-center">
+
+        <div>
+            <img 
+            width="200"
+            height="200"
+            src="~/images/LogotipoRegimens.png"
+            class="logo" />
+        </div>
+
+        <div> 
+
+            <div>
+                <h2 class="fw-bold text-center">Iniciar Sesion</h2>
+                <p class="fw-lighter text-center">Empieza entrando en tu perfil para gestionar tus procesos</p>
+            </div>
+
+            @using (Html.BeginForm("Login", "Formulario", FormMethod.Post))
+            {
+                <div class="campos">
+                    <div class="campo">
+                        <div class="form-floating mb-3">
+                            @Html.TextBoxFor(e => e.usuario, null, new {
+                                    @class = "form-control",
+                                    @id = "input-ci-ec",
+                                    @placeholder = "Ingrese su cedula"
+                                })
+                            <label for="input-ci-ec">Ingrese su cedula</label>
+                            @Html.ValidationMessageFor(e => e.usuario, null, new { @class = "mensaje error_mensaje text-danger" })
+                        </div>
+
+                    </div>
+                    <div class="campo">
+                        <div class="form-floating mb-3">
+                            @Html.PasswordFor(e => e.password, new {
+                                    @class = "form-control mb-3",
+                                    @id = "password", @placeholder = "Ingrese su contraseña" })
+                            @Html.ValidationMessageFor(e => e.password, null, new { @class = "mensaje error_mensaje text-danger" })
+                            <label for="password">Ingrese su contraseña</label>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <input class="btn fw-bold btn-warning" type="submit" value="Iniciar sesion" />
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+
+</div>
+@section Scripts {
+    <script src="~/js/validacionCedula.js"></script>
+    <script src="~/lib/sweetalert/sweetalert.min.js"></script>
+    @if (ViewBag.ErrorMessage != null && ViewBag.ErrorTipo != null)
+    {
+        string mensaje = ViewBag.ErrorMessage as string;
+        string tipo = ViewBag.ErrorTipo as string;
+
+        <script>
+            swal({
+            title: "@tipo",
+            text: "@mensaje",
+            icon: "error",
+            button: "Cerrar"
+            });
+        </script>
+        ViewBag.ErrorMessage = null;
+        ViewBag.ErrorTipo = null;
+    }
+}
+      
+
+
+
+

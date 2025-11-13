@@ -1,0 +1,370 @@
+﻿@using SIS_DIAF.Security;
+@inject EncriptacionPass security;
+
+@model SIS_DIAF.Models.ModelViews.UsuariosModelViews;
+
+@{
+    Layout = "_Layout2";
+    ViewData["Title"] = "Crear Usuario";
+
+
+    string tipo = TempData["tipo"]!.ToString()!;
+    string entrada = TempData["entrada"]!.ToString()!;
+
+
+}
+
+@section styles {
+    <link href="~/css/admin.css" rel="stylesheet" />
+}
+
+<div class="bg-white p-3 crearUsuario m-auto">
+    <h1>Crear Usuario</h1>
+    <div class="mb-3 d-flex justify-content-between" style=" width:100%">
+
+        <button href="#" class="btn btn-success" id="btn-agregarUsuario" data-bs-toggle="modal" data-bs-target="#agregarUsuario">
+            <i class='bx bxs-user-plus'></i>
+            Agregar
+        </button>
+
+        <form id="formularioBusqueda" method="post" asp-controller="Usuario" asp-action="filtroUsuarios">
+            <div class="buscadorPorCampo d-flex align-items-center gap-1">
+
+                <select name="tipo" class="form-select tipoBusqueda" aria-label="Default select example">
+                    <option selected disabled>-- 📃 Filtrar Por --</option>
+                    <option value="1">  🪪 Cedula</option>
+                    <option value="2"> 🧑‍💼 Nombre</option>
+                </select>
+                <div class="input-group">
+                    <input type="text" value="" name="entrada" class="form-control entradaBusqueda" style="width:60%" placeholder="🔎 Busca mas rapido escogiendo un tipo de busqueda" aria-describedby="basic-addon1">
+                </div>
+                <button type="submit" class="btn btn-primary loadingBtn">Buscar</button>
+            </div>
+        </form>
+    </div>
+
+    <div style="overflow-x:auto;height:24rem;">
+        <table class="table table-striped table-bordered table-responsive table-hover mx-auto" style=" width:100%">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-center fw-bold text-primary">Id</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Nombres</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Correo</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Celular</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Cedula</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Estado</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Rol</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Contraseña</th>
+                    <th scope="col" class="text-center fw-bold text-primary">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+
+
+                @foreach (var r in Model.Usuarios)
+                {
+                    if ( r != null )
+                    {
+                        <tr style="white-space:nowrap;">
+                        <td scope="row">@r?.usuario_id</td>
+                        <td style="vertical-align:middle; text-align: center" class="w-50">@r?.usuario_nombre</td>
+                        <td style="vertical-align:middle; text-align: center"><p>@r?.usuario_email</p></td>
+                        <td style="vertical-align:middle; text-align: center">@r?.usuario_celular</td>
+                        <td style="vertical-align:middle; text-align: center">@r?.usuario_cedula</td>
+                        <td style="vertical-align:middle; text-align: center">
+                            
+                            @if (r.usuario_estado.Equals("activo"))
+                            {
+                                <div class="estado activo">@r?.usuario_estado</div>
+                            }
+                            else
+                            {
+                                <div class="estado desactivado">@r?.usuario_estado</div>
+                            }
+                        </td>
+                        <td style="vertical-align:middle; text-align: center">@r?.Rol.rol_descripcion</td>
+                        <td style="vertical-align:middle; text-align: center">
+                            <a href="#" class="btn btn-outline-success" style="height:40px;font-size:medium" data-bs-toggle="modal" id="btn-editar-@r?.usuario_id" data-bs-target="#clave-@r?.usuario_id">
+                                Cambiar Contraseña
+                            </a>
+                            <div class="modal fade formEditar" id="clave-@r?.usuario_id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header d-flex flex-column">
+                                            <h3 class="modal-title fs-5 text-success" id="exampleModalLabel">Actualizacion Credenciales</h3>
+                                            <p class="">Vuelve actualizar la contraseña del usuario que seleccionaste</p>
+                                        </div>
+                                        <form method="POST" id="formularioCambiarContrasena" asp-controller="Usuario" asp-action="ResetPassw">
+                                            <input type="hidden" value="@r?.usuario_id" name="id" />
+                                            <div class="modal-body">
+                                                <div class="campos">
+                                                    <div class="campo">
+                                                        <label for="clave">Ingrese una Contraseña</label>
+                                                        <input type="password" id="Password" name="clave" min="9" placeholder="La contraseña debe tener una longitud de 9" />
+                                                        <span id="mensaje-clave"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" id="botonEnvioFinal" class="btn btn-success loadingBtn">Actualizar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="editar-usuario" style="vertical-align:middle;">
+                            <a href="#" class="btn btn-warning" data-bs-toggle="modal" id="btn-editar-@r?.usuario_id" data-bs-target="#editar-@r?.usuario_id">
+                                <i class='bx bxs-edit-alt' style="font-size:20px;"></i>
+                            </a>
+                            <!-- Formulario para poder agregar a otro usuario -->
+                            <div class="modal fade formEditar" id="editar-@r?.usuario_id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header d-flex flex-column">
+                                            <h3 class="modal-title fs-5 text-success" id="exampleModalLabel">Registrar Rol</h3>
+                                            <p class="">Puedes editar los datos actuales del usuario en cada campo.</p>
+                                        </div>
+                                        <form method="POST" id="formularioEditarUsuario" asp-controller="Usuario" asp-action="Edit">
+                                            <input type="hidden" value="@r?.usuario_id" name="id" />
+                                            <div class="modal-body">
+                                                <div class="campos">
+                                                    <div class="campo">
+                                                        <label for="Nombre">Nombres</label>
+                                                        <input class="text-uppercase" type="text" id="Nombre" name="nombre" value="@r?.usuario_nombre" placeholder="Ingresa nombre y apellido del usuario." />
+                                                        <span id="mensaje-nombre"></span>
+                                                    </div>
+                                                    <div class="campo">
+                                                        <label for="Cedula">Cedula</label>
+                                                        <input type="number" id="Cedula" name="cedula" value="@r?.usuario_cedula" placeholder="Ingresa la cédula del usuario." />
+                                                        <span id="mensaje-cedula"></span>
+                                                    </div>
+                                                    <div class="campo">
+                                                        <label for="Email">Email</label>
+                                                        <input type="email" id="Email" name="email" value="@r?.usuario_email" placeholder="Ingresa un correo electrónico de contacto del usuario." />
+                                                        <span id="mensaje-email"></span>
+                                                    </div>
+                                                    <div class="campo">
+                                                        <label for="Celular">Celular</label>
+                                                        <input type="tel" pattern="[0-9]{10,10}" value="@r?.usuario_celular" id="Celular" name="celular" placeholder="Inserta un número de celular o telefono de contacto" />
+                                                        <span id="mensaje-celular"></span>
+                                                    </div>
+
+                                                    <!-- Este campo solo es para evitar la validacion que agragamos en mi formulario de creacion de usuario-->
+                                                    <div class="campo">
+                                                        <input type="hidden" name="clave" value="inclaveas" />
+                                                        <span id="mensaje-clave"></span>
+                                                    </div>
+                                                    <div class="campo">
+                                                        <label for="estado">Estado</label>
+                                                        <select id="estado" name="estado">
+                                                            @if (r.usuario_estado.Equals("activo"))
+                                                            {
+                                                                <option value="activo" selected>activo</option>
+                                                                <option value="inactivo">inactivo</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="activo">activo</option>
+                                                                <option value="inactivo" selected>inactivo</option>
+                                                            }
+                                                        </select>
+                                                        <span id="mensaje-estado"></span>
+                                                    </div>
+                                                    <div class="campo">
+                                                        <label for="Rol">Asignar rol</label>
+                                                        <select id="Rol" name="rol">
+
+                                                            @foreach (var rol in Model.listaRoles)
+                                                            {
+                                                                if (r.Rol.rol_descripcion.Equals(rol.rol_descripcion))
+                                                                {
+                                                                    <option selected value="@rol.rol_id">@rol.rol_descripcion </option>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option value="@rol.rol_id">@rol.rol_descripcion</option>
+
+                                                                }
+                                                            }
+                                                        </select>
+                                                        <span id="mensaje-rol"></span>
+                                                    </div>
+                                                    <div class="campo">
+                                                        <label for="sucursal">Asignar Sucursal</label>
+                                                        <select id="sucursal" name="sucursal">
+
+                                                            @foreach (var sucursal in Model.listaSucursales)
+                                                            {
+                                                                if (r.SucursalId.Equals(sucursal.sucursal_id))
+                                                                {
+                                                                    <option value="@sucursal.sucursal_id" selected>@sucursal.sucursal_nombre</option>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option value="@sucursal.sucursal_id">@sucursal.sucursal_nombre</option>
+                                                                }
+
+                                                            }
+                                                        </select>
+                                                        <span id="mensaje-sucursal"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-success loadingBtn" id="botonEnvioFinal">Registrar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                }
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="acciones-paginador" style="margin:10px auto 0 auto;width:100%;">
+        <a asp-controller="Usuario" asp-action="ListaUsuarios" class="btn btn-warning loadingPayload">🏠 Inicio</a>
+
+        @if ( security.DesencriptarUrl(entrada).Equals("vacio") && security.DesencriptarUrl(tipo).Equals("0") )
+        {
+            <a asp-controller="Usuario" asp-action="ListaUsuarios" asp-route-direccion="@( security.EncriptrarUrl("atras") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )-1).ToString()) )" aria-disabled="@TempData["b-back"]" class="btn btn-primary @TempData["b-s-back"] loadingPayload">⬅️ Atras</a>
+            <a asp-controller="Usuario" asp-action="ListaUsuarios" asp-route-direccion="@( security.EncriptrarUrl("siguiente") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )+1).ToString()) )" aria-disabled="@TempData["b-next"]!.ToString()" class="btn btn-primary @TempData["b-s-next"] loadingPayload">Siguiente ➡️</a>
+        
+        }
+        else
+        {
+            <a asp-controller="Usuario" asp-action="ListaUsuarios" asp-route-tipo="@tipo" asp-route-entrada="@entrada" asp-route-direccion="@( security.EncriptrarUrl("atras") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )-1).ToString()) )" aria-disabled="@TempData["b-back"]" class="btn btn-primary @TempData["b-s-back"] loadingPayload">⬅️ Atras</a>
+            <a asp-controller="Usuario" asp-action="ListaUsuarios" asp-route-tipo="@tipo" asp-route-entrada="@entrada" asp-route-direccion="@( security.EncriptrarUrl("siguiente") )" asp-route-pagina="@( security.EncriptrarUrl((int.Parse( security.DesencriptarUrl(TempData["pagina"]!.ToString()) )+1).ToString()) )" aria-disabled="@TempData["b-next"]!.ToString()" class="btn btn-primary @TempData["b-s-next"] loadingPayload">Siguiente ➡️</a>
+        }
+    </div>
+
+    <!-- Formulario Para poder Registrar al usuario -->
+    <div class="modal fade formRegistrar" id="agregarUsuario" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header d-flex flex-column">
+                    <h3 class="modal-title fs-5 text-success" id="exampleModalLabel">Usuario Rol</h3>
+                    <p class="">Puedes registrar tu usuario delegandole un rol y un estado</p>
+                </div>
+                <form method="POST" id="formularioCrearUsuario" asp-controller="Usuario" asp-action="Create">
+                    <div class="modal-body">
+                        <div class="campos">
+                            <div class="campo">
+                                <label for="Nombre">Nombres</label>
+                                <input class="text-uppercase" type="text" id="Nombre" name="nombre" placeholder="Ingresa nombre y apellido del usuario." />
+                                <span id="mensaje-nombre"></span>
+                            </div>
+                            <div class="campo">
+                                <label for="Cedula">Cedula</label>
+                                <input type="number" id="Cedula" name="cedula" placeholder="Ingresa la cédula del usuario." />
+                                <span id="mensaje-cedula"></span>
+                            </div>
+                            <div class="campo">
+                                <label for="Email">Email</label>
+                                <input type="email" id="Email" name="email" placeholder="Ingresa un correo electrónico de contacto del usuario." />
+                                <span id="mensaje-email"></span>
+                            </div>
+                            <div class="campo">
+                                <label for="Celular">Celular</label>
+                                <input type="tel" pattern="[0-9]{10,10}" id="Celular" name="celular" placeholder="Inserta un número de celular o telefono de contacto" />
+                                <span id="mensaje-celular"></span>
+                            </div>
+                            <div class="campo">
+                                <label for="Password">Contraseña</label>
+                                <input type="password" id="Password" name="clave" placeholder="Asignale una contraseña segura al usuario" />
+                                <span id="mensaje-clave"></span>
+                            </div>
+                            <div class="campo">
+                                <label for="estado">Estado</label>
+                                <select id="estado" name="estado">
+                                    <option disabled selected value="">-- escoge un estado --</option>
+                                    <option value="activo">activo</option>
+                                    <option value="inactivo">inactivo</option>
+                                </select>
+                                <span id="mensaje-estado"></span>
+                            </div>
+                            <div class="campo">
+                                <label for="rol">Asignar Rol</label>
+                                <select id="rol" name="rol">
+                                    <option value="" selected>Seleccione un rol</option>
+                                    @foreach (var rol in Model.listaRoles)
+                                    {
+                                        <option value="@rol.rol_id">@rol.rol_descripcion</option>
+
+                                    }
+                                </select>
+                                <span id="mensaje-rol"></span>
+                            </div>
+                            <div class="campo">
+                                <label for="sucursal">Asignar Sucursal</label>
+                                <select id="sucursal" name="sucursal">
+                                    <option value="" selected>Seleccione una Sucursal</option>
+                                    @foreach (var sucursal in Model.listaSucursales)
+                                    {
+                                        <option value="@sucursal.sucursal_id">@sucursal.sucursal_nombre</option>
+
+                                    }
+                                </select>
+                                <span id="mensaje-sucursal"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success loadingBtn" id="botonEnvioFinal">Registrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/ValidarFormsRegimen.js"></script>
+
+@section Scripts {
+
+    <script src="~/js/validacionCedula.js"></script>
+    <script src="~/js/FormularioUsuario.js"></script>
+
+    @{
+        if (this.TempData.ContainsKey("status") && this.TempData["status"] != null)
+        {
+            var resultado = this.TempData["status"];
+
+             if (resultado.Equals("false"))
+            {
+                <script>
+
+                    swal({
+                        title: "Error",
+                        text: "Error de registro, posiblemente la cédula ya esta registrado ... comunícate con TI.",
+                        icon: "error",
+                        button: "Cerrar"
+                    });
+                </script>
+            }
+            else if (resultado.Equals("true"))
+            {
+                <script>
+                    swal({
+                        title: "Exito",
+                        text: "El proceso se completo correctamente",
+                        icon: "success",
+                        button: "Cerrar"
+                    });
+                </script>
+            }
+
+            this.TempData.Remove("status");
+        }
+
+    }
+}
+

@@ -1,0 +1,57 @@
+.navbar {
+    position: unset;
+}
+
+.logisticaAdministrador {
+    width: 97%; 
+
+    .tablero {
+        background-color: rgb(255, 255, 255);
+        
+        p { 
+            color: rgba( 0 0 0 / .5);
+        }
+
+        .section 
+        {
+            border-bottom: 1px solid rgba( 0 0 0 / .1);
+            margin-bottom: 40px;
+        }
+
+        .panel 
+        {
+            box-shadow: 3px 0px 3px 4px rgba( 0 0 0 / .2);
+            border-radius: 4px;
+
+            .tarjeta 
+            {
+                margin-bottom: 10px;
+                border: 1px solid rgba( 0 0 0 / .1);
+                padding: 10px;
+                border-radius: 10px;
+
+                .descripcion 
+                {
+                    width: 40%;
+                }
+
+                .asignacionResponsable {
+                    display: flex;
+                    flex-direction: column;
+                    gap:10px;
+                    select 
+                    {
+                        border:1px solid rgba( 0 0 0 / .1);
+                        padding:5px;
+                        border-radius: 5px;
+                    }
+                }
+            }
+        }
+    }
+}   
+
+.secciones 
+{
+
+}
