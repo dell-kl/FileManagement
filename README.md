@@ -188,6 +188,7 @@ En `appsettings.json` (añadir estas secciones):
 }
 ```
 
+
 ### Configuración de Email
 
 El sistema utiliza credenciales encriptadas almacenadas en la tabla `ServicioCorreo`. Para modificarlas:
