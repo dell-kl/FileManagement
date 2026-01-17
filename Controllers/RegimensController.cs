@@ -140,9 +140,9 @@ namespace SIS_DIAF.Controllers
         public ActionResult filtrarListadoRegimens(string presupuesto, string tipo, string entrada)
         {
             //vamos a filtrar los datos respectivos....
-            presupuesto = (!presupuesto.IsNullOrEmpty()) ? _security.EncriptrarUrl(presupuesto) : presupuesto;
-            tipo = (!tipo.IsNullOrEmpty()) ? _security.EncriptrarUrl(tipo) : tipo;
-            entrada = (!entrada.IsNullOrEmpty()) ? _security.EncriptrarUrl(entrada) : entrada;
+            presupuesto = (!string.IsNullOrEmpty(presupuesto)) ? _security.EncriptrarUrl(presupuesto) : presupuesto;
+            tipo = (!string.IsNullOrEmpty(tipo)) ? _security.EncriptrarUrl(tipo) : tipo;
+            entrada = (!string.IsNullOrEmpty(entrada)) ? _security.EncriptrarUrl(entrada) : entrada;
 
             //vamos a tener que redireccioanrlo en alguna parte. 
             return RedirectToAction("Index", "Regimens", new { tipo = tipo, entrada = entrada, presupuesto = presupuesto });
@@ -220,7 +220,7 @@ namespace SIS_DIAF.Controllers
                     return  RedirectToAction("Index");
                 }
 
-                if ( !reg.objetivo.IsNullOrEmpty() && reg.usuario != 0 && reg.presupuesto != 0 && reg.sucursal != 0 && reg.tipo != 0 )
+                if ( !string.IsNullOrEmpty(reg.objetivo) && reg.usuario != 0 && reg.presupuesto != 0 && reg.sucursal != 0 && reg.tipo != 0 )
                 {
                     //antes de realizar todo el proceso de creacion del regimen y las respectivas asignaciones del responsable,etc.,
                     //tenemos que validar primero si existe un usuario con el perfil de "LOGISTICA ADMINISTRADOR" que tambien

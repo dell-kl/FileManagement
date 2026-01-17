@@ -19,7 +19,7 @@ namespace SIS_DIAF.Repositorios
         {
             var resultado = this._contex.Rol.Where(r => r.rol_descripcion.Equals(x.rol_descripcion)).ToListAsync().Result;
 
-            if ( resultado.IsNullOrEmpty() )
+            if ( !resultado.Any() )
                 _contex.Rol.Add(x);
 
             return await _contex.SaveChangesAsync()>0;
@@ -66,7 +66,7 @@ namespace SIS_DIAF.Repositorios
                 si hay un registro, comparamos los id del Rol "x" y de mi resultado para 
                 ver si estan colocando nuevamente el nombre de un rol ya existente... 
                 */
-                if (resultado.IsNullOrEmpty() || resultado.First().rol_id.Equals(x.rol_id))
+                if (!resultado.Any() || resultado.First().rol_id.Equals(x.rol_id))
                     _contex.Rol.Update(x);
 
                 return await _contex.SaveChangesAsync() > 0;

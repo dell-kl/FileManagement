@@ -17,7 +17,7 @@ namespace SIS_DIAF.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.14")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -121,8 +121,7 @@ namespace SIS_DIAF.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("regimen_fecha_creacion")
-                        .IsRequired()
+                    b.Property<DateTime>("regimen_fecha_creacion")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("regimen_guid")

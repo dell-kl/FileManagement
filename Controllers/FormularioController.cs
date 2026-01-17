@@ -38,7 +38,7 @@ namespace SIS_DIAF.Controllers
             
             var rol = this.__sesion.verificarAutenticacion();
             
-            if (!rol.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(rol))
             {
                 return MostrarPerfil(rol);
             }

@@ -53,7 +53,7 @@ namespace SIS_DIAF.Seed
                 email = _security.EncriptarDatos(email);
                 host = _security.EncriptarDatos(host);
 
-                ServicioCorreo servicioCorreo = new ServicioCorreo()
+                ServicioCorreo servicioCorreo = new ServicioCorreo()    
                 {
                     srvCorreo_email = email,
                     srvCorreo_host = host,

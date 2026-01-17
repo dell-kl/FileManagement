@@ -70,7 +70,7 @@ namespace SIS_DIAF.Controllers
                 archivos = (List<Archivo>)await _serv_regimen.GetArchivosLogistica(cod);
                 ICollection<Archivo> listaArch = new List<Archivo>();
                 
-                if ( !archivos.IsNullOrEmpty() )
+                if ( archivos.Any() )
                     //la posicion de estos archivos deben encontrarse de esta manera...
                     listaArch = new List<Archivo>() {
                         await _serv_arch.GetxId(9,cod),

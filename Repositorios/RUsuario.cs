@@ -110,7 +110,7 @@ namespace SIS_DIAF.Repositorios
                     .Include(r => r.Rol)
                     .ToListAsync();
 
-                if ( !resultado.IsNullOrEmpty() )
+                if ( resultado.Any() )
                 {
                     if ( resultado.First().usuario_nIntentos == 0 )
                     {

@@ -92,7 +92,7 @@ namespace SIS_DIAF.Repositorios
 
 
                 ICollection<Archivo> archivos = await __context.Archivos
-                    .Where(n => n.Regimen.regimen_id.Equals(regimen.regimen_id) && n.TipoArchivo.TipoReg.nombre_tipo_reg.Equals("LOGISTICA") && (n.archivo_ruta == null || subArchivos.IsNullOrEmpty() ))
+                    .Where(n => n.Regimen.regimen_id.Equals(regimen.regimen_id) && n.TipoArchivo.TipoReg.nombre_tipo_reg.Equals("LOGISTICA") && (n.archivo_ruta == null || !subArchivos.Any() ))
                     .ToListAsync(); 
 
                 regimen.Archivos = archivos;

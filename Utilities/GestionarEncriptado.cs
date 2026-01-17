@@ -31,14 +31,14 @@ namespace SIS_DIAF.Utilities
 
         private Dictionary<string,string> verificarEncriptadoDatos(Dictionary<string,string> datos)
         {
-            datos["tipo"] = (datos["tipo"].IsNullOrEmpty()) ? _security.EncriptrarUrl("0") : datos["tipo"];
-            datos["entrada"] = (datos["entrada"].IsNullOrEmpty()) ? _security.EncriptrarUrl("vacio") : datos["entrada"];
+            datos["tipo"] = (string.IsNullOrEmpty(datos["tipo"])) ? _security.EncriptrarUrl("0") : datos["tipo"];
+            datos["entrada"] = (string.IsNullOrEmpty(datos["entrada"])) ? _security.EncriptrarUrl("vacio") : datos["entrada"];
 
             if ( datos.ContainsKey("presupuesto") )
-                datos["presupuesto"] = (datos["presupuesto"].IsNullOrEmpty()) ? _security.EncriptrarUrl("0") : datos["presupuesto"];
-            
-            datos["pagina"] = (datos["pagina"].IsNullOrEmpty()) ? _security.EncriptrarUrl("0") : datos["pagina"];
-            datos["direccion"] = (datos["direccion"].IsNullOrEmpty()) ? _security.EncriptrarUrl("siguiente") : datos["direccion"];
+                datos["presupuesto"] = (string.IsNullOrEmpty(datos["presupuesto"])) ? _security.EncriptrarUrl("0") : datos["presupuesto"];
+
+            datos["pagina"] = (string.IsNullOrEmpty(datos["pagina"])) ? _security.EncriptrarUrl("0") : datos["pagina"];
+            datos["direccion"] = (string.IsNullOrEmpty(datos["direccion"])) ? _security.EncriptrarUrl("siguiente") : datos["direccion"];
 
             return datos;
         }

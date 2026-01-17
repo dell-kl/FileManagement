@@ -196,7 +196,7 @@ namespace SIS_DIAF.Repositorios
                 .ToListAsync();
 
 
-                if (!listadoRegimens.IsNullOrEmpty() )
+                if (listadoRegimens.Any() )
                 {
                     foreach (var rR in listadoRegimens)
                     {
@@ -249,7 +249,7 @@ namespace SIS_DIAF.Repositorios
 
             //filtrar 
 
-            if (!responsableRegimen.IsNullOrEmpty())
+            if (responsableRegimen.Any())
             {
                 foreach (var rR in responsableRegimen)
                 {
@@ -373,7 +373,7 @@ namespace SIS_DIAF.Repositorios
                 .Where(n => n.usuario.RolId.Equals(6) && n.usuario.usuario_cedula!.Equals(cedula)) //filtrar para que tenga un numero de cedula.
                 .ToListAsync();
 
-            if ( !responableRegimen.IsNullOrEmpty() )
+            if ( responableRegimen.Any() )
             {
                 foreach(var rR in responableRegimen)
                 {
@@ -465,7 +465,7 @@ namespace SIS_DIAF.Repositorios
                 .Select(rg => rg.regimen)
                 .ToListAsync();
 
-            if ( !listadoRegimenes.IsNullOrEmpty() )
+            if ( listadoRegimenes.Any() )
             {
                 ResponsableRegimen respRegimen = new ResponsableRegimen()
                 {
@@ -618,7 +618,7 @@ namespace SIS_DIAF.Repositorios
                 !n.TipoArchivo.TipoRegId.Equals(1) && !n.TipoArchivo.TipoRegId.Equals(5))
                 .ToListAsync();
 
-            if (  _archivos.IsNullOrEmpty() )
+            if (  !_archivos.Any() )
             {
                 return new List<string>();
             }
@@ -666,10 +666,10 @@ namespace SIS_DIAF.Repositorios
 
             //este codigo solo trae todos los archivos, que tenga el TipoRegimen distinto de GENERAL
             //y LOGISTICA...
-            object datos = !datoRegimen.IsNullOrEmpty() ? datoRegimen : null;
+            object datos = datoRegimen.Any() ? datoRegimen : null;
 
             if (datos == null)
-                datos = !datoResponsableRegimen.IsNullOrEmpty() ? datoResponsableRegimen : null;
+                datos = datoResponsableRegimen.Any() ? datoResponsableRegimen : null;
 
             
         }

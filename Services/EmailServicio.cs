@@ -58,7 +58,7 @@ namespace SIS_DIAF.Services
             {
                 ICollection<Usuario> usuarios = await _usuario.Listar();
 
-                if ( !usuarios.IsNullOrEmpty() )
+                if ( usuarios.Any() )
                 {
                     obtenerDatosDesencriptadosCorreo();
 

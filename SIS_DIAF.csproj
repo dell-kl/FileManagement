@@ -1,0 +1,78 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>.</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="appsettings.Development.json" />
+    <Content Remove="wwwroot\js\FormularioUsuario.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Transact-SQL\SeedRol.sql" />
+    <None Remove="Transact-SQL\SeedSucursales.sql" />
+    <None Remove="Transact-SQL\SeedTipoArchivo.sql" />
+    <None Remove="Transact-SQL\SeedTipoReg.sql" />
+    <None Remove="Transact-SQL\SeedUsuarios.sql" />
+    <None Remove="Views\Rol\4nodkzqg.ic5~" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\css\footer.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\FormularioUsuario.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <None Include="Transact-SQL\SeedRol.sql" />
+	  <None Include="Transact-SQL\SeedSucursales.sql" />
+	  <None Include="Transact-SQL\SeedTipoArchivo.sql" />
+	  <None Include="Transact-SQL\SeedTipoReg.sql" />
+	  <None Include="Transact-SQL\SeedUsuarios.sql" />
+  </ItemGroup>
+	
+	
+<ItemGroup>
+  <!-- Incluir todos los archivos .sql en la carpeta Scripts/Sql y copiarlos a la carpeta de publicación -->
+  <None Update="Transact-SQL\**\*.sql">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+  </None>
+</ItemGroup>
+
+
+  <ItemGroup>
+    <None Include="wwwroot\js\FormularioUsuario.js" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="EASendMail" Version="7.9.2.9" />
+		<PackageReference Include="MailKit" Version="4.14.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="10.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.DataProtection.Abstractions" Version="10.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Build" Version="18.0.2" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0-preview2.25289.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.SqlServer.Server" Version="1.0.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0-preview.4" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.0-rc.1.25458.5" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="Select.HtmlToPdf.NetCore" Version="25.2.0" />
+	</ItemGroup>
+
+</Project>
