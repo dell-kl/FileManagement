@@ -45,9 +45,9 @@ namespace SIS_DIAF.Seed
             
             if (!context.ServicioCorreo.Any())
             {
-                string email = "diafquito@diaf.gob.ec";
-                string credenciales = "123456";
-                string host = "mail.diaf.gob.ec";
+                string email = "email_enviar_correos";
+                string credenciales = "password";
+                string host = "host_mail";
 
                 credenciales = _security.EncriptarPassword(credenciales);
                 email = _security.EncriptarDatos(email);
